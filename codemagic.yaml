@@ -30,15 +30,16 @@ workflows:
       - name: Install CocoaPods dependencies
         script: |
           cd ios/App && pod install
+      - name: Switch to manual code signing
+        script: |
+          sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' ios/App/App.xcodeproj/project.pbxproj
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/App/App.xcodeproj/project.pbxproj
       - name: Set up code signing
         script: |
           keychain initialize
           app-store-connect fetch-signing-files "$APP_ID" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
-      - name: Switch to manual code signing
-        script: |
-          sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' ios/App/App.xcodeproj/project.pbxproj
       - name: Build ipa for distribution
         script: |
           xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
