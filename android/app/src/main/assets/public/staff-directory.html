@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ستافی پەیمانگە - CIS Sulaimany</title>
+
+    <link rel="icon" type="image/jpeg" href="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107">
+    <meta name="theme-color" content="#00bfff">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #00bfff;
+            --primary-dark: #008ab8;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 24px 16px;
+            text-align: center;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        .institute-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 3px solid #fff;
+            background: #fff;
+            padding: 5px;
+            margin-bottom: 8px;
+        }
+        .header h1 { color: white; font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+        .header p { color: rgba(255,255,255,0.9); font-size: 12px; }
+
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            background: white;
+            color: var(--text-gray);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .filter-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .staff-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 14px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .staff-card:active { transform: scale(0.97); }
+
+        @media (max-width: 640px) {
+            .staff-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            .staff-card {
+                padding: 10px 4px;
+                border-radius: 12px;
+            }
+            .staff-card .staff-photo,
+            .staff-card .staff-photo-placeholder {
+                width: 58px;
+                height: 58px;
+                font-size: 22px;
+                margin-bottom: 6px;
+            }
+            .staff-card .staff-name {
+                font-size: 11px;
+                margin-bottom: 0;
+            }
+            .staff-card .staff-role,
+            .staff-card .staff-specialty,
+            .staff-card .staff-contact {
+                display: none;
+            }
+        }
+
+        /* Profile modal */
+        .staff-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 6000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .staff-modal-overlay.active { display: flex; }
+        .staff-modal {
+            background: white;
+            border-radius: 18px;
+            max-width: 340px;
+            width: 100%;
+            padding: 26px 20px;
+            text-align: center;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .staff-modal-close {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--light-bg);
+            color: var(--text-gray);
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .staff-modal-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin-bottom: 14px;
+        }
+        .staff-modal-photo-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--light-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            color: #94a3b8;
+            font-size: 44px;
+        }
+        .staff-modal-name { font-weight: 700; font-size: 18px; margin-bottom: 6px; }
+        .staff-modal-role {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            background: #e0f7ff;
+            padding: 4px 14px;
+            border-radius: 14px;
+            margin-bottom: 14px;
+        }
+        .staff-modal-specialty {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+        .staff-modal-location {
+            font-size: 13px;
+            color: var(--text-gray);
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .staff-msg-note {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-gray);
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            text-align: right;
+        }
+        .staff-msg-note i { color: var(--primary); margin-top: 2px; }
+
+        .staff-photo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .staff-photo-placeholder {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--light-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: #94a3b8;
+            font-size: 34px;
+        }
+
+        .staff-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+        .staff-role {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            background: #e0f7ff;
+            padding: 3px 12px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .staff-specialty {
+            font-size: 11px;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .staff-contact {
+            font-size: 12px;
+            color: var(--text-gray);
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            text-align: right;
+        }
+        .staff-contact div { margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .staff-contact div:last-child { margin-bottom: 0; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-gray); grid-column: 1 / -1; }
+        .empty-state i { font-size: 44px; color: #cbd5e1; margin-bottom: 14px; display: block; }
+        .loading-state { text-align: center; padding: 60px 20px; color: var(--text-gray); grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i></a>
+        <img src="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107" class="institute-logo" alt="لۆگۆ">
+        <h1><i class="fas fa-id-badge"></i> ستافی پەیمانگە</h1>
+        <p>ئەرشیفی وێنە و زانیاری پەیوەندی مامۆستایان و فەرمانبەران</p>
+    </div>
+
+    <div class="content">
+        <div class="filter-bar">
+            <button class="filter-chip active" data-role="all" onclick="filterStaff('all')">هەموو</button>
+            <button class="filter-chip" data-role="بەڕێوەبەر" onclick="filterStaff('بەڕێوەبەر')">بەڕێوەبەران</button>
+            <button class="filter-chip" data-role="یاریدەدەر" onclick="filterStaff('یاریدەدەر')">یاریدەدەران</button>
+            <button class="filter-chip" data-role="مامۆستا" onclick="filterStaff('مامۆستا')">مامۆستایان</button>
+            <button class="filter-chip" data-role="فەرمانبەر" onclick="filterStaff('فەرمانبەر')">فەرمانبەران</button>
+        </div>
+
+        <div class="staff-grid" id="staffGrid">
+            <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> بارکردن...</div>
+        </div>
+    </div>
+
+    <div class="staff-modal-overlay" id="staffModalOverlay" onclick="if(event.target===this) closeStaffModal()">
+        <div class="staff-modal">
+            <button class="staff-modal-close" onclick="closeStaffModal()"><i class="fas fa-times"></i></button>
+            <div id="staffModalBody"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLlHLpZ0S3_Ll93-h93Nyhx2kuXChH1Js",
+            authDomain: "school-cis-e188b.firebaseapp.com",
+            databaseURL: "https://school-cis-e188b-default-rtdb.firebaseio.com",
+            projectId: "school-cis-e188b",
+            storageBucket: "school-cis-e188b.firebasestorage.app",
+            messagingSenderId: "206651660812",
+            appId: "1:206651660812:web:5d9b06f66e1352e3b5ec29"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let allStaff = [];
+        let currentFilter = 'all';
+
+        database.ref('staffDirectory').on('value', (snapshot) => {
+            const data = snapshot.val();
+            allStaff = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+            allStaff.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ku'));
+            renderStaffGrid();
+        }, () => {
+            document.getElementById('staffGrid').innerHTML = `
+                <div class="empty-state"><i class="fas fa-exclamation-triangle"></i>نەتوانرا زانیارییەکان بار بکرێت</div>`;
+        });
+
+        function filterStaff(role) {
+            currentFilter = role;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.filter-chip[data-role="${role}"]`).classList.add('active');
+            renderStaffGrid();
+        }
+
+        function renderStaffGrid() {
+            const grid = document.getElementById('staffGrid');
+            const items = currentFilter === 'all' ? allStaff : allStaff.filter(s => s.role === currentFilter);
+
+            grid.innerHTML = '';
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><i class="fas fa-users-slash"></i>هیچ ستافێک تۆمار نەکراوە</div>`;
+                return;
+            }
+
+            items.forEach((s, index) => {
+                const card = document.createElement('div');
+                card.className = 'staff-card';
+                card.onclick = () => openStaffModal(s);
+                card.innerHTML = `
+                    ${s.photo
+                        ? `<img src="${s.photo}" class="staff-photo" alt="${s.name}">`
+                        : `<div class="staff-photo-placeholder"><i class="fas fa-user"></i></div>`}
+                    <div class="staff-name">${s.name}</div>
+                    <div class="staff-role">${s.role || ''}</div>
+                    ${s.specialty ? `<div class="staff-specialty">${s.specialty}</div>` : ''}
+                    ${s.location ? `<div class="staff-contact"><div><i class="fas fa-map-marker-alt"></i> ${s.location}</div></div>` : ''}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        let activeStaffForMessage = null;
+
+        function openStaffModal(s) {
+            activeStaffForMessage = s;
+            const body = document.getElementById('staffModalBody');
+            body.innerHTML = `
+                ${s.photo
+                    ? `<img src="${s.photo}" class="staff-modal-photo" alt="${s.name}">`
+                    : `<div class="staff-modal-photo-placeholder"><i class="fas fa-user"></i></div>`}
+                <div class="staff-modal-name">${s.name}</div>
+                <div class="staff-modal-role">${s.role || ''}</div>
+                ${s.specialty ? `<div class="staff-modal-specialty"><i class="fas fa-graduation-cap"></i> ${s.specialty}</div>` : ''}
+                ${s.location ? `<div class="staff-modal-location"><i class="fas fa-map-marker-alt"></i> ${s.location}</div>` : ''}
+                <div class="staff-msg-note"><i class="fas fa-info-circle"></i> بۆ ناردنی پەیام بۆ مامۆستا/بەڕێوەبەر/یاریدەدەر، تکایە لە هەژماری تایبەتی خۆتەوە (خوێندکار یان بەخێوکار) بچۆرەژوورەوە.</div>
+            `;
+            document.getElementById('staffModalOverlay').classList.add('active');
+        }
+
+        function closeStaffModal() {
+            document.getElementById('staffModalOverlay').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

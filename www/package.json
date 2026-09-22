@@ -1,0 +1,11 @@
+{
+  "name": "cordova-plugin-cis-appsettings",
+  "version": "1.0.0",
+  "description": "Opens Android notification settings / battery optimization prompt for the CIS Sulaimany app",
+  "cordova": {
+    "id": "cordova-plugin-cis-appsettings",
+    "platforms": ["android"]
+  },
+  "keywords": ["cordova", "android", "notifications", "battery"],
+  "license": "MIT"
+}

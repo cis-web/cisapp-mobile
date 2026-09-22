@@ -1,0 +1,8 @@
+{
+  "appId": "com.it.cis.sul",
+  "appName": "CISAPP",
+  "webDir": "www",
+  "android": {
+    "path": "android-new"
+  }
+}

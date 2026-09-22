@@ -1,0 +1,11 @@
+{
+	"appId": "com.it.cis.sul",
+	"appName": "CISAPP",
+	"webDir": "www",
+	"cordova": {
+		"preferences": {
+			"ScrollEnabled": "false",
+			"BackupWebStorage": "none"
+		}
+	}
+}

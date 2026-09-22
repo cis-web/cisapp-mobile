@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بەخێوکاری خوێندکار - CIS Sulaimany</title>
+
+    <link rel="icon" type="image/jpeg" href="logo-cis.jpg">
+    <meta name="theme-color" content="#00bfff">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #00bfff;
+            --primary-dark: #008ab8;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        /* ===== Login Page ===== */
+        #loginPage {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #00bfff 0%, #008ab8 100%);
+        }
+        .login-box {
+            background: white;
+            border-radius: 18px;
+            padding: 36px 28px;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        .institute-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 3px solid var(--primary);
+            padding: 5px;
+            margin-bottom: 12px;
+        }
+        .login-box h1 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .login-box p {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 22px;
+        }
+        .feature-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .feature-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #eaf9ff;
+            border: 1px solid #cdeffc;
+            color: var(--primary-dark);
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .feature-chip i { font-size: 10px; }
+        .form-group { text-align: right; margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-dark);
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .error-msg {
+            display: none;
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 18px;
+            font-size: 13px;
+            color: var(--text-gray);
+            text-decoration: none;
+        }
+
+        .qr-scan-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .qr-scan-btn:hover {
+            background: rgba(0,191,255,0.08);
+        }
+
+        .qr-scanner-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .qr-scanner-overlay.active { display: flex; }
+
+        .qr-scanner-box {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 340px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+
+        .qr-scanner-close {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--light-bg);
+            color: var(--text-gray);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #qrVideo {
+            width: 100%;
+            border-radius: 12px;
+            background: #000;
+        }
+
+        /* ===== Portal ===== */
+        #portalPage { display: none; }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 28px 16px 20px;
+            text-align: center;
+            position: relative;
+        }
+        .header .institute-logo { border-color: white; background: white; }
+        .header h1 { color: white; font-size: 16px; margin-bottom: 2px; }
+        .header p { color: rgba(255,255,255,0.9); font-size: 12px; }
+
+        /* ئایکۆنەکانی سەرەوە (زەنگۆلە و ناردنی پەیام) - هاوشێوەی داشبۆردی مامۆستا */
+        .header-icons {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            display: flex;
+            gap: 10px;
+            z-index: 5;
+        }
+        .header-icon-btn {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.22);
+            color: #fff;
+            font-size: 19px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+        }
+        .header-icon-btn:hover {
+            background: rgba(255,255,255,0.38);
+            transform: translateY(-2px);
+        }
+        .header-icon-badge {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            background: #db2777;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            padding: 1px 6px;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        /* دوگمەی چوونەدەرەوە - ڕوون و دیار، لەژێر هێدەر */
+        .logout-bar-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            border: none;
+            background: var(--danger);
+            color: #fff;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .logout-bar-btn:hover { filter: brightness(0.92); }
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+            padding: 14px 16px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .section-grid-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 11px 10px;
+            border-radius: 12px;
+            border: none;
+            background: var(--light-bg);
+            color: var(--text-gray);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+        .section-grid-item.active { background: var(--primary); color: white; }
+
+        .content { max-width: 700px; margin: 0 auto; padding: 20px 16px 40px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            border-right: 4px solid var(--primary);
+        }
+        .card.type-negative, .card.priority-high { border-right-color: #ef4444; }
+        .card.type-positive { border-right-color: #10b981; }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .card-title { font-weight: 700; font-size: 15px; }
+        .badge-tag {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: var(--light-bg);
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+        .badge-tag.negative, .badge-tag.high { background: #fee2e2; color: #b91c1c; }
+        .badge-tag.positive { background: #d1fae5; color: #047857; }
+        .card-body { font-size: 14px; color: var(--text-gray); margin-bottom: 8px; white-space: pre-line; }
+        .card-date { font-size: 12px; color: #94a3b8; text-align: left; }
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-gray); }
+        .empty-state i { font-size: 40px; color: #cbd5e1; margin-bottom: 12px; display: block; }
+        .loading-state { text-align: center; padding: 50px 20px; color: var(--text-gray); }
+
+        .section-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .compose-toggle-btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .compose-toggle-btn:hover { background: var(--primary-dark); }
+        #composePanelGuardian {
+            display: none;
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            border: 2px solid var(--primary);
+        }
+        #composePanelGuardian.active { display: block; }
+        #composePanelGuardian .form-group { margin-bottom: 12px; }
+        #composePanelGuardian select,
+        #composePanelGuardian textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        #composePanelGuardian select:focus,
+        #composePanelGuardian textarea:focus { outline: none; border-color: var(--primary); }
+        .compose-send-btn {
+            width: 100%;
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 11px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .compose-send-btn:hover { background: var(--primary-dark); }
+        .compose-sent-notice {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #d1fae5;
+            color: #047857;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .compose-sent-notice.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== Login Page ===== -->
+    <div id="loginPage">
+        <div class="login-box">
+            <img src="logo-cis.jpg" class="institute-logo" alt="لۆگۆ">
+            <h1>بەخێوکاری خوێندکار</h1>
+            <p>تکایە ناوی بەکارهێنەر و وشەی نهێنیت بنووسە</p>
+
+            <div class="feature-preview">
+                <div class="feature-chip"><i class="fas fa-eye"></i> چاودێری خوێندکار</div>
+                <div class="feature-chip"><i class="fas fa-star-half-alt"></i> هەڵسەنگاندنی مامۆستا</div>
+                <div class="feature-chip"><i class="fas fa-clipboard-list"></i> تێبینی کارگێڕی</div>
+                <div class="feature-chip"><i class="fas fa-bell"></i> ئاگاداریەکان</div>
+                <div class="feature-chip"><i class="fas fa-calendar-check"></i> مۆڵەت و ئامادەبوون</div>
+            </div>
+
+            <div class="error-msg" id="errorMsg">
+                <i class="fas fa-exclamation-circle"></i> ناوی بەکارهێنەر یان وشەی نهێنی هەڵەیە
+            </div>
+
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> ناوی بەکارهێنەر</label>
+                    <input type="text" id="username" placeholder="ناوی بەکارهێنەر" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> وشەی نهێنی</label>
+                    <input type="password" id="password" placeholder="وشەی نهێنی" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> چوونەژوورەوە
+                </button>
+            </form>
+
+            <button type="button" class="qr-scan-btn" onclick="openQRScanner()">
+                <i class="fas fa-qrcode"></i> سکانی بارکۆد بۆ چوونەژوورەوە
+            </button>
+
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i> گەڕانەوە بۆ سەرەکی</a>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qrScannerModal" class="qr-scanner-overlay">
+        <div class="qr-scanner-box">
+            <button class="qr-scanner-close" onclick="closeQRScanner()"><i class="fas fa-times"></i></button>
+            <p style="margin-bottom:10px; font-weight:600;">بارکۆدەکە بخەرە ناو چوارچێوەکە</p>
+            <video id="qrVideo" playsinline></video>
+            <canvas id="qrCanvas" style="display:none;"></canvas>
+            <p id="qrScanStatus" style="margin-top:10px; font-size:13px; color:var(--text-gray);">چاوەڕێی کامێرا...</p>
+        </div>
+    </div>
+
+    <!-- ===== Portal Page ===== -->
+    <div id="portalPage">
+        <div class="header">
+            <div class="header-icons">
+                <button class="header-icon-btn" onclick="openGuardianMessagesFromHeader()" title="پەیامەکان" aria-label="پەیامەکان">
+                    <i class="fas fa-bell"></i>
+                    <span id="headerGuardianUnreadBadge" class="header-icon-badge" style="display:none;">0</span>
+                </button>
+                <button class="header-icon-btn" onclick="openGuardianComposeFromHeader()" title="ناردنی پەیامی نوێ" aria-label="ناردنی پەیامی نوێ">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <img src="logo-cis.jpg" class="institute-logo" alt="لۆگۆ">
+            <h1 id="welcomeText">بەخێربێیت</h1>
+            <p>بەخێوکاری خوێندکار</p>
+        </div>
+        <button class="logout-bar-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> چوونەدەرەوە
+        </button>
+
+        <div class="section-grid">
+            <button class="section-grid-item active" data-tab="monitoring" onclick="switchTab('monitoring')">
+                <i class="fas fa-eye"></i> چاودێری خوێندکار
+            </button>
+            <button class="section-grid-item" data-tab="evaluation" onclick="switchTab('evaluation')">
+                <i class="fas fa-star-half-alt"></i> هەڵسەنگاندنی مامۆستا
+            </button>
+            <button class="section-grid-item" data-tab="notes" onclick="switchTab('notes')">
+                <i class="fas fa-clipboard-list"></i> تێبینی کارگێڕی
+            </button>
+            <button class="section-grid-item" data-tab="announcements" onclick="switchTab('announcements')">
+                <i class="fas fa-bell"></i> ئاگاداریەکان
+            </button>
+            <button class="section-grid-item" data-tab="leaveAttendance" onclick="switchTab('leaveAttendance')">
+                <i class="fas fa-calendar-check"></i> مۆڵەت و ئامادەبوون
+            </button>
+            <button class="section-grid-item" data-tab="messages" onclick="switchTab('messages')" style="position:relative;">
+                <i class="fas fa-envelope"></i> پەیامەکانم
+                <span id="guardianUnreadBadge" style="display:none; position:absolute; top:4px; left:4px; background:#db2777; color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; font-weight:800;">0</span>
+            </button>
+        </div>
+
+        <div class="content">
+            <div class="tab-content active" id="tab-monitoring">
+                <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> بارکردن...</div>
+            </div>
+            <div class="tab-content" id="tab-evaluation">
+                <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> بارکردن...</div>
+            </div>
+            <div class="tab-content" id="tab-notes">
+                <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> بارکردن...</div>
+            </div>
+            <div class="tab-content" id="tab-announcements">
+                <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> بارکردن...</div>
+            </div>
+            <div class="tab-content" id="tab-leaveAttendance">
+                <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> بارکردن...</div>
+            </div>
+            <div class="tab-content" id="tab-messages">
+                <div class="section-header-row">
+                    <h2 style="font-size:16px;"><i class="fas fa-envelope" style="color:var(--primary);"></i> پەیامەکانم</h2>
+                    <button type="button" class="compose-toggle-btn" onclick="toggleComposePanelGuardian()"><i class="fas fa-paper-plane"></i> ناردنی پەیامی نوێ</button>
+                </div>
+
+                <div id="composePanelGuardian">
+                    <div class="form-group">
+                        <label><i class="fas fa-user-tag"></i> پەیامەکە بۆ کێ بنێردرێت؟</label>
+                        <select id="composeRecipientTypeGuardian" onchange="updateComposeRecipientFieldsGuardian()">
+                            <option value="teacher">مامۆستا</option>
+                            <option value="assistant">یاریدەدەر</option>
+                            <option value="admin">بەڕێوەبەر</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="composeTeacherGroupGuardian">
+                        <label><i class="fas fa-chalkboard-teacher"></i> مامۆستا هەڵبژێرە</label>
+                        <select id="composeTeacherNameGuardian"></select>
+                    </div>
+                    <div class="form-group" id="composeAssistantGroupGuardian" style="display:none;">
+                        <label><i class="fas fa-user-shield"></i> یاریدەدەر هەڵبژێرە</label>
+                        <select id="composeAssistantNameGuardian"></select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-align-right"></i> پەیامەکەت</label>
+                        <textarea id="composeMessageTextGuardian" rows="4" placeholder="پەیامەکەت لێرە بنووسە..."></textarea>
+                    </div>
+                    <button type="button" class="compose-send-btn" onclick="sendNewGuardianMessage()"><i class="fas fa-paper-plane"></i> ناردن</button>
+                    <div id="composeSentNoticeGuardian" class="compose-sent-notice"><i class="fas fa-check-circle"></i> پەیامەکەت نێردرا، سوپاس!</div>
+                </div>
+
+                <h3 style="font-size:14px; margin:18px 0 10px;"><i class="fas fa-paper-plane" style="color:var(--primary);"></i> پەیامە نێردراوەکانم</h3>
+                <div id="guardianSentMessagesList" style="margin-bottom:20px;">
+                    <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> بارکردن...</div>
+                </div>
+
+                <h3 style="font-size:14px; margin:18px 0 10px;"><i class="fas fa-inbox" style="color:var(--primary);"></i> پەیامەکانی وەرگیراو</h3>
+                <div id="guardianMessagesListInner">
+                    <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> بارکردن...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLlHLpZ0S3_Ll93-h93Nyhx2kuXChH1Js",
+            authDomain: "school-cis-e188b.firebaseapp.com",
+            databaseURL: "https://school-cis-e188b-default-rtdb.firebaseio.com",
+            projectId: "school-cis-e188b",
+            storageBucket: "school-cis-e188b.firebasestorage.app",
+            messagingSenderId: "206651660812",
+            appId: "1:206651660812:web:5d9b06f66e1352e3b5ec29"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let currentGuardian = null;
+        let dataLoaded = { monitoring: false, evaluation: false, notes: false, announcements: false };
+
+        // ===== Auto login from previous session =====
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('guardianLogin');
+            if (saved) {
+                const { username, password } = JSON.parse(saved);
+                attemptLogin(username, password, true);
+            }
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            attemptLogin(username, password, false);
+        }
+
+        function attemptLogin(username, password, isAuto) {
+            database.ref('guardians/' + username).once('value', (snapshot) => {
+                const guardian = snapshot.val();
+                if (guardian && guardian.password === password) {
+                    currentGuardian = { username, ...guardian };
+                    localStorage.setItem('guardianLogin', JSON.stringify({ username, password }));
+                    oneSignalSetIdentity(username, 'guardian');
+                    showPortal();
+                } else if (!isAuto) {
+                    document.getElementById('errorMsg').style.display = 'block';
+                } else {
+                    localStorage.removeItem('guardianLogin');
+                }
+            }, () => {
+                if (!isAuto) document.getElementById('errorMsg').style.display = 'block';
+            });
+        }
+
+        // ===== QR Code Scanner =====
+        let qrStream = null;
+        let qrScanInterval = null;
+
+        function openQRScanner() {
+            document.getElementById('qrScannerModal').classList.add('active');
+            document.getElementById('qrScanStatus').textContent = 'چاوەڕێی کامێرا...';
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    qrStream = stream;
+                    const video = document.getElementById('qrVideo');
+                    video.srcObject = stream;
+                    video.setAttribute('playsinline', true);
+                    video.play();
+                    document.getElementById('qrScanStatus').textContent = 'بارکۆدەکە بخەرە بەردەم کامێرا';
+                    qrScanInterval = setInterval(scanQRFrame, 300);
+                })
+                .catch(() => {
+                    document.getElementById('qrScanStatus').textContent = 'نەتوانرا دەستگەیشتن بە کامێرا بکرێت. ڕێگە بدە بە بەکارهێنانی کامێرا لە ڕێکخستنەکانی ئەپدا.';
+                });
+        }
+
+        function scanQRFrame() {
+            const video = document.getElementById('qrVideo');
+            const canvas = document.getElementById('qrCanvas');
+            if (!video.videoWidth) return;
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+                try {
+                    const parsed = JSON.parse(code.data);
+                    if (parsed.u && parsed.p) {
+                        closeQRScanner();
+                        document.getElementById('username').value = parsed.u;
+                        document.getElementById('password').value = parsed.p;
+                        attemptLogin(parsed.u, parsed.p, false);
+                        return;
+                    }
+                } catch (e) {
+                    document.getElementById('qrScanStatus').textContent = 'ئەم بارکۆدە بۆ چوونەژوورەوە نییە';
+                }
+            }
+        }
+
+        function closeQRScanner() {
+            document.getElementById('qrScannerModal').classList.remove('active');
+            if (qrScanInterval) { clearInterval(qrScanInterval); qrScanInterval = null; }
+            if (qrStream) {
+                qrStream.getTracks().forEach(track => track.stop());
+                qrStream = null;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('guardianLogin');
+            currentGuardian = null;
+            oneSignalClearIdentity();
+            document.getElementById('portalPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showPortal() {
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('portalPage').style.display = 'block';
+            document.getElementById('welcomeText').textContent = 'بەخێربێیت ' + currentGuardian.name;
+            loadMonitoringTab();
+            loadEvaluationTab();
+            loadNotesTab();
+            loadAnnouncementsTab();
+            loadLeaveAttendanceTab();
+            loadGuardianMessagesTab();
+            loadComposeRecipientListsGuardian();
+            loadGuardianSentMessages();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.section-grid-item').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.section-grid-item[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        function openGuardianMessagesFromHeader() {
+            switchTab('messages');
+            setTimeout(() => {
+                const el = document.getElementById('tab-messages');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
+
+        function openGuardianComposeFromHeader() {
+            switchTab('messages');
+            setTimeout(() => {
+                const panel = document.getElementById('composePanelGuardian');
+                if (panel) {
+                    panel.classList.add('active');
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 50);
+        }
+
+        // ===== Student Monitoring =====
+        function loadMonitoringTab() {
+            const typeClassMap = { 'نەرێنی': 'negative', 'ئەرێنی': 'positive' };
+            database.ref('studentMonitoring').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const container = document.getElementById('tab-monitoring');
+                container.innerHTML = '';
+                let items = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+                if (currentGuardian && currentGuardian.studentName) {
+                    items = items.filter(i => i.studentName === currentGuardian.studentName);
+                }
+                if (items.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i>هیچ تۆمارێک نییە</div>`;
+                    return;
+                }
+                items.sort((a, b) => new Date(b.date) - new Date(a.date));
+                items.forEach(item => {
+                    const cls = typeClassMap[item.type] || '';
+                    const div = document.createElement('div');
+                    div.className = 'card' + (cls ? ' type-' + cls : '');
+                    div.innerHTML = `
+                        <div class="card-top">
+                            <span class="card-title"><i class="fas fa-user"></i> ${item.studentName}</span>
+                            <span class="badge-tag ${cls}">${item.type}</span>
+                        </div>
+                        <div class="card-body">${item.note}</div>
+                        <div class="card-date">${new Date(item.date).toLocaleDateString('ku')}</div>`;
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // ===== Teacher Evaluation =====
+        function loadEvaluationTab() {
+            database.ref('teacherEvaluations').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const container = document.getElementById('tab-evaluation');
+                container.innerHTML = '';
+                let items = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+                if (currentGuardian && currentGuardian.studentName) {
+                    items = items.filter(i => !i.studentName || i.studentName === currentGuardian.studentName);
+                }
+                if (items.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i>هیچ هەڵسەنگاندنێک نییە</div>`;
+                    return;
+                }
+                items.sort((a, b) => new Date(b.date) - new Date(a.date));
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.innerHTML = `
+                        <div class="card-top">
+                            <span class="card-title"><i class="fas fa-chalkboard-teacher"></i> ${item.teacherName}</span>
+                            <span class="badge-tag"><i class="fas fa-star"></i> ${item.score} / 10</span>
+                        </div>
+                        ${item.studentName ? `<div class="card-body"><i class="fas fa-user"></i> ${item.studentName}</div>` : ''}
+                        <div class="card-body">${item.comment || ''}</div>
+                        <div class="card-date">${new Date(item.date).toLocaleDateString('ku')}</div>`;
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // ===== Institute Notes =====
+        function loadNotesTab() {
+            database.ref('instituteNotes').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const container = document.getElementById('tab-notes');
+                container.innerHTML = '';
+                let items = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+                if (currentGuardian && currentGuardian.studentName) {
+                    items = items.filter(i => !i.studentName || i.studentName === currentGuardian.studentName);
+                }
+                if (items.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i>هیچ تێبینییەک نییە</div>`;
+                    return;
+                }
+                items.sort((a, b) => new Date(b.date) - new Date(a.date));
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.innerHTML = `
+                        <div class="card-title"><i class="fas fa-file-alt"></i> ${item.title}</div>
+                        ${item.studentName ? `<div class="card-body"><i class="fas fa-user"></i> ${item.studentName}</div>` : ''}
+                        <div class="card-body">${item.content}</div>
+                        <div class="card-date">${new Date(item.date).toLocaleDateString('ku')}</div>`;
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // ===== Leave & Attendance =====
+        function getGuardianBaseName() {
+            if (!currentGuardian || !currentGuardian.studentName) return null;
+            return currentGuardian.studentName.split(' - ')[0].trim();
+        }
+
+        function loadLeaveAttendanceTab() {
+            const baseName = getGuardianBaseName();
+            const container = document.getElementById('tab-leaveAttendance');
+
+            if (!baseName) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i>ناوی خوێندکارت لەگەڵ ئەم هەژمارەدا تۆمار نەکراوە، پەیوەندی بە بەڕێوەبەرەوە بکە</div>`;
+                return;
+            }
+
+            // Find the student's code (needed to match attendance records)
+            database.ref('students').once('value', (studentsSnap) => {
+                const studentsData = studentsSnap.val() || {};
+                let studentCode = null;
+                Object.keys(studentsData).forEach(key => {
+                    const s = studentsData[key];
+                    if (s && s.name === baseName) {
+                        studentCode = s.code || s.id || key;
+                    }
+                });
+
+                loadAbsencesForGuardian(studentCode, baseName);
+                loadLeavesForGuardian(baseName);
+            });
+        }
+
+        function loadAbsencesForGuardian(studentCode, baseName) {
+            database.ref('attendance').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const records = [];
+                if (data && studentCode) {
+                    Object.keys(data).forEach(date => {
+                        const dateData = data[date] || {};
+                        Object.keys(dateData).forEach(levelGroup => {
+                            const courses = dateData[levelGroup] || {};
+                            Object.keys(courses).forEach(course => {
+                                const times = courses[course] || {};
+                                Object.keys(times).forEach(time => {
+                                    const teachers = times[time] || {};
+                                    Object.keys(teachers).forEach(teacher => {
+                                        const students = teachers[teacher] || {};
+                                        if (students[studentCode] === 'absent') {
+                                            records.push({
+                                                date, levelGroup, course, time,
+                                                teacher: teacher.replace(/_/g, ' ')
+                                            });
+                                        }
+                                    });
+                                });
+                            });
+                        });
+                    });
+                }
+                records.sort((a, b) => new Date(b.date) - new Date(a.date));
+                renderLeaveAttendanceTab(records, null);
+            });
+        }
+
+        function loadLeavesForGuardian(baseName) {
+            database.ref('leaves').on('value', (snapshot) => {
+                const data = snapshot.val();
+                let leaves = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+                leaves = leaves.filter(l => l.studentName === baseName);
+                leaves.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+                renderLeaveAttendanceTab(null, leaves);
+            });
+        }
+
+        let cachedAbsences = [];
+        let cachedLeaves = [];
+        function renderLeaveAttendanceTab(absences, leaves) {
+            if (absences !== null) cachedAbsences = absences;
+            if (leaves !== null) cachedLeaves = leaves;
+
+            const container = document.getElementById('tab-leaveAttendance');
+            let html = '';
+
+            html += `<h4 style="margin-bottom:10px;"><i class="fas fa-user-times"></i> تۆماری غیاب</h4>`;
+            if (cachedAbsences.length === 0) {
+                html += `<div class="empty-state"><i class="fas fa-check-circle"></i>هیچ تۆمارێکی غیاب نییە</div>`;
+            } else {
+                cachedAbsences.forEach(r => {
+                    html += `
+                        <div class="card type-negative">
+                            <div class="card-top">
+                                <span class="card-title"><i class="fas fa-book"></i> ${r.course}</span>
+                                <span class="badge-tag negative">غیاب</span>
+                            </div>
+                            <div class="card-body">مامۆستا: ${r.teacher} — کاتژمێر: ${r.time} — پۆل: ${r.levelGroup}</div>
+                            <div class="card-date">${r.date}</div>
+                        </div>`;
+                });
+            }
+
+            html += `<h4 style="margin:20px 0 10px;"><i class="fas fa-plane-departure"></i> تۆماری مۆڵەت</h4>`;
+            if (cachedLeaves.length === 0) {
+                html += `<div class="empty-state"><i class="fas fa-inbox"></i>هیچ تۆمارێکی مۆڵەت نییە</div>`;
+            } else {
+                cachedLeaves.forEach(l => {
+                    html += `
+                        <div class="card">
+                            <div class="card-top">
+                                <span class="card-title"><i class="fas fa-calendar-alt"></i> ${l.reason || 'مۆڵەت'}</span>
+                                <span class="badge-tag">${l.days || ''} ڕۆژ</span>
+                            </div>
+                            <div class="card-body">لە ${l.startDate} بۆ ${l.endDate}${l.notes ? ' — ' + l.notes : ''}</div>
+                            <div class="card-date">تۆمارکراوە لەلایەن: ${l.recordedBy || '-'}</div>
+                        </div>`;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ===== Announcements =====
+        function loadAnnouncementsTab() {
+            database.ref('announcements').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const container = document.getElementById('tab-announcements');
+                container.innerHTML = '';
+                const items = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+                if (items.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-bell-slash"></i>هیچ ئاگاداریەک نییە</div>`;
+                    return;
+                }
+                items.sort((a, b) => new Date(b.date) - new Date(a.date));
+                items.forEach(item => {
+                    const isHigh = item.priority === 'گرنگ';
+                    const div = document.createElement('div');
+                    div.className = 'card' + (isHigh ? ' priority-high' : '');
+                    div.innerHTML = `
+                        <div class="card-top">
+                            <span class="card-title"><i class="fas ${isHigh ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${item.title}</span>
+                            <span class="badge-tag ${isHigh ? 'high' : ''}">${item.priority}</span>
+                        </div>
+                        <div class="card-body">${item.message}</div>
+                        <div class="card-date">${new Date(item.date).toLocaleDateString('ku')}</div>`;
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // ===== Direct Messages (from admin/assistant) =====
+        let guardianMessagesRecords = [];
+
+        function loadGuardianMessagesTab() {
+            const baseName = getGuardianBaseName();
+            if (!baseName) return;
+
+            database.ref('guardianMessages').on('value', (snapshot) => {
+                if (!currentGuardian) return;
+                const data = snapshot.val();
+                let items = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+                console.log('[GuardianMsgDiag] my username:', currentGuardian.username, '| my studentName:', currentGuardian.studentName);
+                console.log('[GuardianMsgDiag] all guardianMessages records:', items);
+                items = items.filter(m => m.guardianUsername ? (m.guardianUsername === currentGuardian.username) : (m.studentName === currentGuardian.studentName));
+                console.log('[GuardianMsgDiag] matched messages for me:', items);
+                items.sort((a, b) => new Date(b.date) - new Date(a.date));
+                guardianMessagesRecords = items;
+
+                const badge = document.getElementById('guardianUnreadBadge');
+                const headerBadge = document.getElementById('headerGuardianUnreadBadge');
+                const unreadCount = items.filter(m => !m.read).length;
+                [badge, headerBadge].forEach(b => {
+                    if (!b) return;
+                    if (unreadCount > 0) {
+                        b.textContent = unreadCount;
+                        b.style.display = 'inline-block';
+                    } else {
+                        b.style.display = 'none';
+                    }
+                });
+
+                renderGuardianMessagesTab();
+            });
+        }
+
+        function renderGuardianMessagesTab() {
+            const container = document.getElementById('guardianMessagesListInner');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (guardianMessagesRecords.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-envelope-open"></i>هیچ پەیامێکت نییە</div>`;
+                return;
+            }
+
+            guardianMessagesRecords.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'card' + (m.read ? '' : ' type-negative');
+                div.innerHTML = `
+                    <div class="card-top">
+                        <span class="card-title"><i class="fas fa-user-shield"></i> ${m.senderName}</span>
+                        ${m.read ? '' : '<span class="badge-tag negative">نوێ</span>'}
+                    </div>
+                    <div class="card-body">${m.message}</div>
+                    ${m.reply ? `<div style="font-size:13px; color:#047857; background:#d1fae5; padding:10px; border-radius:8px; margin-top:8px;"><strong><i class="fas fa-reply"></i> وەڵامی تۆ:</strong> ${m.reply}</div>` : ''}
+                    ${(!m.reply) ? `
+                    <div id="guardianReplyBox-${m.id}" style="display:none; margin-top:10px;">
+                        <textarea id="guardianReplyText-${m.id}" rows="3" placeholder="وەڵامەکەت بنووسە..." style="width:100%; padding:8px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px; resize:vertical;"></textarea>
+                        <button onclick="sendGuardianReply('${m.id}')" style="margin-top:6px; border:none; background:var(--primary); color:white; padding:7px 14px; border-radius:8px; font-size:12px; cursor:pointer;"><i class="fas fa-paper-plane"></i> ناردنی وەڵام</button>
+                    </div>` : ''}
+                    <div class="card-date" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>${new Date(m.date).toLocaleString('ku')}</span>
+                        <div style="display:flex; gap:6px;">
+                            ${(!m.reply) ? `<button onclick="toggleGuardianReplyBox('${m.id}')" style="border:none; background:var(--primary); color:white; padding:5px 10px; border-radius:8px; font-size:11px; cursor:pointer;"><i class="fas fa-reply"></i> وەڵام</button>` : ''}
+                            ${m.read ? '' : `<button onclick="markGuardianMessageRead('${m.id}')" style="border:none; background:#10b981; color:white; padding:5px 10px; border-radius:8px; font-size:11px; cursor:pointer;"><i class="fas fa-check"></i> خوێندمەوە</button>`}
+                        </div>
+                    </div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleGuardianReplyBox(id) {
+            const box = document.getElementById('guardianReplyBox-' + id);
+            if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function sendGuardianReply(id) {
+            const textEl = document.getElementById('guardianReplyText-' + id);
+            const replyText = textEl.value.trim();
+            if (!replyText) {
+                alert('تکایە وەڵامەکەت بنووسە');
+                return;
+            }
+            database.ref('guardianMessages/' + id).update({
+                reply: replyText,
+                replyDate: new Date().toISOString(),
+                read: true
+            }).catch(() => {
+                alert('نەتوانرا وەڵامەکە بنێردرێت');
+            });
+        }
+
+        function markGuardianMessageRead(id) {
+            database.ref('guardianMessages/' + id).update({ read: true });
+        }
+
+        // ===== Compose new message (to teacher / assistant / admin) =====
+        let guardianComposeTeacherNameToUsername = {};
+        function loadComposeRecipientListsGuardian() {
+            database.ref('teachers').once('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                const select = document.getElementById('composeTeacherNameGuardian');
+                if (!select) return;
+                const teacherEntries = Object.keys(data)
+                    .filter(username => data[username].type === 'teacher')
+                    .map(username => ({ username, name: data[username].name }))
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ku'));
+                guardianComposeTeacherNameToUsername = {};
+                teacherEntries.forEach(t => { guardianComposeTeacherNameToUsername[t.name] = t.username; });
+                select.innerHTML = teacherEntries.map(t => `<option value="${t.name}">${t.name}</option>`).join('') ||
+                    '<option value="">هیچ مامۆستایەک تۆمار نەکراوە</option>';
+            });
+
+            database.ref('assistants').once('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                const select = document.getElementById('composeAssistantNameGuardian');
+                if (!select) return;
+                const assistantEntries = Object.keys(data)
+                    .map(username => ({ username, name: data[username].name }))
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ku'));
+                select.innerHTML = assistantEntries.map(a => `<option value="${a.username}">${a.name}</option>`).join('') ||
+                    '<option value="">هیچ یاریدەدەرێک تۆمار نەکراوە</option>';
+            });
+        }
+
+        function toggleComposePanelGuardian() {
+            const panel = document.getElementById('composePanelGuardian');
+            panel.classList.toggle('active');
+        }
+
+        function updateComposeRecipientFieldsGuardian() {
+            const type = document.getElementById('composeRecipientTypeGuardian').value;
+            document.getElementById('composeTeacherGroupGuardian').style.display = type === 'teacher' ? 'block' : 'none';
+            document.getElementById('composeAssistantGroupGuardian').style.display = type === 'assistant' ? 'block' : 'none';
+        }
+
+        function sendNewGuardianMessage() {
+            if (!currentGuardian) return;
+            const type = document.getElementById('composeRecipientTypeGuardian').value;
+            const messageText = document.getElementById('composeMessageTextGuardian').value.trim();
+
+            if (!messageText) {
+                alert('تکایە پەیامەکەت بنووسە');
+                return;
+            }
+
+            let staffName = '';
+            let staffDisplayName = '';
+
+            if (type === 'teacher') {
+                const select = document.getElementById('composeTeacherNameGuardian');
+                staffName = select.value;
+                staffDisplayName = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : '';
+                if (!staffName) {
+                    alert('تکایە مامۆستایەک هەڵبژێرە');
+                    return;
+                }
+            } else if (type === 'assistant') {
+                const select = document.getElementById('composeAssistantNameGuardian');
+                staffName = select.value;
+                staffDisplayName = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : '';
+                if (!staffName) {
+                    alert('تکایە یاریدەدەرێک هەڵبژێرە');
+                    return;
+                }
+            } else {
+                staffName = 'admin';
+                staffDisplayName = 'بەڕێوەبەری پەیمانگە';
+            }
+
+            const senderName = `${currentGuardian.name} (بەخێوکاری ${currentGuardian.studentName || ''})`;
+
+            database.ref('staffMessages').push({
+                staffName: staffName,
+                staffDisplayName: staffDisplayName,
+                senderName: senderName,
+                senderId: currentGuardian.username || '',
+                senderPhone: currentGuardian.phone || '',
+                message: messageText,
+                date: new Date().toISOString(),
+                read: false,
+                fromAdmin: false
+            }).then(() => {
+                const pushTarget = (type === 'teacher') ? (guardianComposeTeacherNameToUsername[staffName] || staffName) : staffName;
+                sendPushNotification({ externalId: pushTarget }, 'پەیامی نوێ لە بەخێوکار', `${senderName}: ${messageText}`);
+                document.getElementById('composeMessageTextGuardian').value = '';
+                const notice = document.getElementById('composeSentNoticeGuardian');
+                notice.classList.add('active');
+                setTimeout(() => notice.classList.remove('active'), 3000);
+            }).catch(() => {
+                alert('نەتوانرا پەیامەکە بنێردرێت، تکایە دووبارە هەوڵ بدەرەوە');
+            });
+        }
+
+        // ===== Messages I sent to staff (with their replies) =====
+        let guardianSentMessagesRecords = [];
+
+        function loadGuardianSentMessages() {
+            if (!currentGuardian) return;
+            const expectedSenderName = `${currentGuardian.name} (بەخێوکاری ${currentGuardian.studentName || ''})`;
+            database.ref('staffMessages').on('value', (snapshot) => {
+                const data = snapshot.val();
+                guardianSentMessagesRecords = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const m = { id: key, ...data[key] };
+                        const matchesById = m.senderId && m.senderId === currentGuardian.username;
+                        // فۆڵباک بۆ پەیامە کۆنەکان کە پێش زیادکردنی senderId نێردراون
+                        const matchesByName = !m.senderId && m.senderName === expectedSenderName;
+                        if (matchesById || matchesByName) {
+                            guardianSentMessagesRecords.push(m);
+                        }
+                    });
+                }
+                guardianSentMessagesRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+                renderGuardianSentMessages();
+            });
+        }
+
+        function renderGuardianSentMessages() {
+            const list = document.getElementById('guardianSentMessagesList');
+            if (!list) return;
+
+            if (guardianSentMessagesRecords.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="fas fa-paper-plane"></i>هیچ پەیامێکت نەناردووە</div>';
+                return;
+            }
+
+            list.innerHTML = guardianSentMessagesRecords.map(m => `
+                <div class="card" style="border-right:4px solid ${m.reply ? '#10b981' : '#cbd5e1'};">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                        <span style="font-weight:700; font-size:13px;"><i class="fas fa-paper-plane"></i> بۆ: ${m.staffDisplayName || m.staffName}</span>
+                        ${m.reply ?
+                            '<span style="background:#d1fae5; color:#047857; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:700;">وەڵامدرایەوە</span>' :
+                            '<span style="background:#f1f5f9; color:#64748b; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:700;">چاوەڕوانی وەڵام</span>'}
+                    </div>
+                    <div style="font-size:14px; color:var(--text-dark); background:var(--light); padding:10px; border-radius:8px; margin-bottom:8px;">${m.message}</div>
+                    ${m.reply ? `<div style="font-size:13px; color:#047857; background:#d1fae5; padding:10px; border-radius:8px; margin-bottom:8px;"><strong><i class="fas fa-reply"></i> وەڵام:</strong> ${m.reply}</div>` : ''}
+                    <div style="font-size:11px; color:var(--text-gray);">${new Date(m.date).toLocaleString('ku')}</div>
+                </div>
+            `).join('');
+        }
+    </script>
+    <script src="onesignal-init.js"></script>
+</body>
+</html>

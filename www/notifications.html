@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ئاگاداریەکان - CIS Sulaimany</title>
+
+    <link rel="icon" type="image/jpeg" href="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107">
+    <meta name="theme-color" content="#00bfff">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #00bfff;
+            --primary-dark: #008ab8;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 24px 16px;
+            text-align: center;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        .institute-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 3px solid #fff;
+            background: #fff;
+            padding: 5px;
+            margin-bottom: 8px;
+        }
+        .header h1 { color: white; font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+        .header p { color: rgba(255,255,255,0.9); font-size: 12px; }
+        .content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            border-right: 4px solid var(--primary);
+        }
+        .card.priority-high { border-right-color: #f97316; background: #fff7ed; }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .badge-tag {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: var(--light-bg);
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+        .badge-tag.high { background: #ffedd5; color: #c2410c; }
+        .card-body { font-size: 14px; color: var(--text-gray); margin-bottom: 8px; }
+        .card-date { font-size: 12px; color: #94a3b8; text-align: left; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+        }
+        .empty-state i { font-size: 44px; color: #cbd5e1; margin-bottom: 14px; display: block; }
+        .loading-state { text-align: center; padding: 60px 20px; color: var(--text-gray); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i></a>
+        <img src="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107" class="institute-logo" alt="لۆگۆ">
+        <h1><i class="fas fa-bell"></i> ئاگاداریەکان</h1>
+        <p>ئاگادارکردنەوە گشتیەکانی پەیمانگا</p>
+    </div>
+
+    <div class="content" id="listContainer">
+        <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> بارکردن...</div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLlHLpZ0S3_Ll93-h93Nyhx2kuXChH1Js",
+            authDomain: "school-cis-e188b.firebaseapp.com",
+            databaseURL: "https://school-cis-e188b-default-rtdb.firebaseio.com",
+            projectId: "school-cis-e188b",
+            storageBucket: "school-cis-e188b.firebasestorage.app",
+            messagingSenderId: "206651660812",
+            appId: "1:206651660812:web:5d9b06f66e1352e3b5ec29"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        database.ref('announcements').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const container = document.getElementById('listContainer');
+            container.innerHTML = '';
+
+            if (!data) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        هیچ ئاگاداریەک نییە
+                    </div>`;
+                return;
+            }
+
+            const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            items.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            items.forEach(item => {
+                const isHigh = item.priority === 'گرنگ';
+                const div = document.createElement('div');
+                div.className = 'card' + (isHigh ? ' priority-high' : '');
+                div.innerHTML = `
+                    <div class="card-top">
+                        <span class="card-title"><i class="fas ${isHigh ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${item.title}</span>
+                        <span class="badge-tag ${isHigh ? 'high' : ''}">${item.priority}</span>
+                    </div>
+                    <div class="card-body">${item.message}</div>
+                    <div class="card-date">${new Date(item.date).toLocaleDateString('ku')}</div>
+                `;
+                container.appendChild(div);
+            });
+        }, (error) => {
+            document.getElementById('listContainer').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    نەتوانرا زانیارییەکان بار بکرێت
+                </div>`;
+        });
+    </script>
+</body>
+</html>

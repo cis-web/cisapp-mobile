@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تۆماری کەل و پەلی پەیمانگە</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1e88e5;
+            --secondary: #1565c0;
+            --success: #43a047;
+            --warning: #fb8c00;
+            --danger: #e53935;
+            --light: #f5f5f5;
+            --dark: #263238;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #00bfff 0%, #008ab8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* چوونەژوورەوە */
+        #loginPage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .back-home-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary, #1e88e5);
+            text-decoration: none;
+            margin-top: 18px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(30, 136, 229, 0.1);
+            transition: all 0.2s;
+        }
+
+        .back-home-link:hover {
+            background: rgba(30, 136, 229, 0.18);
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .login-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .login-subtitle {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* پەڕەی سەرەکی */
+        #mainPage {
+            display: none;
+        }
+
+        header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .institute-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--secondary);
+            line-height: 1.3;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .user-info {
+            background: var(--light);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .logout-btn:hover {
+            background: #c62828;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: var(--light);
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status-available { color: var(--success); font-weight: bold; }
+        .status-used { color: var(--primary); font-weight: bold; }
+        .status-repair { color: var(--warning); font-weight: bold; }
+        .status-lost { color: var(--danger); font-weight: bold; }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-secondary:hover, .btn-success:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .login-card {
+                padding: 20px 15px;
+                max-width: 100%;
+            }
+
+            .login-logo {
+                width: 60px;
+                height: 60px;
+                margin: 0 auto 10px;
+            }
+
+            .login-title {
+                font-size: 18px;
+            }
+
+            .login-subtitle {
+                font-size: 12px;
+            }
+
+            .institute-logo {
+                max-width: 60px;
+                max-height: 60px;
+            }
+
+            .logo-container {
+                padding: 15px !important;
+            }
+
+            .logo-text {
+                font-size: 18px !important;
+            }
+
+            .subtitle {
+                font-size: 12px !important;
+            }
+
+            .form-group label {
+                font-size: 12px;
+            }
+
+            .form-group input, .form-group select {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            #statsContainer {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- پەڕەی چوونەژوورەوە -->
+    <div id="loginPage">
+        <div class="login-card">
+            <div class="login-header">
+             <img src="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107" alt="پەیمانگای کۆمپیوتەری سلێمانی" class="institute-logo" onerror="this.style.display='none';">
+                <h2 class="login-title">سیستەمی ئامار</h2>
+                <p class="login-subtitle">پەیمانگەی کۆمپیوتەری سلێمانی</p>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>ئیمەیڵ</label>
+                    <input type="email" 
+                           class="form-control" 
+                           id="emailInput" 
+                           placeholder="example@cis.edu" 
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>وشەی نهێنی</label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="passwordInput" 
+                           placeholder="••••••••" 
+                           required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    چوونەژوورەوە
+                </button>
+            </form>
+
+            <a href="index.html" class="back-home-link">→ گەڕانەوە بۆ سەرەکی</a>
+        </div>
+    </div>
+
+    <!-- پەڕەی سەرەکی -->
+    <div id="mainPage">
+        <div class="container">
+            <header>
+                <div class="logo-container">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107" 
+                         alt="لۆگۆی پەیمانگە" 
+                         class="institute-logo" 
+                         onerror="this.style.display='none';">
+                    <div class="logo-text">سیستەمی ئامار</div>
+                    <p class="subtitle">پەیمانگەی کۆمپیوتەری سلێمانی</p>
+                </div>
+                <div class="user-info">
+                    <span>بەخێربێیت، <strong id="userEmail"></strong></span>
+                    <button class="logout-btn" onclick="logout()">دەرچوون</button>
+                </div>
+            </header>
+
+            <div class="main-card">
+                <div class="tabs">
+                    <button class="tab active" data-tab="addAsset">زیادکردنی کەل و پەل</button>
+                    <button class="tab" data-tab="viewAssets">بینینی کەل و پەلەکان</button>
+                </div>
+
+                <!-- تابی زیادکردنی کەل و پەل -->
+                <div id="addAsset" class="tab-content active">
+                    <h3 class="card-title">زیادکردنی کەل و پەلی نوێ</h3>
+                    
+                    <div class="success-message" id="successMessage">
+                        کەل و پەل بەسەرکەوتوویی زیادکرا!
+                    </div>
+
+                    <form id="assetForm">
+                        <div class="form-group">
+                            <label>ناوی شوێن</label>
+                            <input type="text" class="form-control" id="locationName" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>جۆری کەل و پەل</label>
+                            <input type="text" class="form-control" id="assetType" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>ژمارە</label>
+                            <input type="number" class="form-control" id="assetQuantity" min="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>بەرواری وەرگرتن</label>
+                            <input type="date" class="form-control" id="acquisitionDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>بارودۆخ</label>
+                            <select class="form-control" id="status" required>
+                                <option value="">هەڵبژاردن...</option>
+                                <option value="بەردەستە">بەردەستە</option>
+                                <option value="بەکارهێنراوە">بەکارهێنراوە</option>
+                                <option value="چاککردن">چاککردن</option>
+                                <option value="لەناوچوو">لەناوچوو</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            زیادکردن
+                        </button>
+                    </form>
+                </div>
+
+                <!-- تابی بینینی کەل و پەلەکان -->
+                <div id="viewAssets" class="tab-content">
+                    <h3 class="card-title">لیستی کەل و پەلەکان</h3>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" id="printBtn">چاپکردن</button>
+                        <button class="btn btn-success" id="exportExcelBtn">دەرهێنان بۆ Excel</button>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="searchInput" placeholder="گەڕان...">
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <select class="form-control" id="locationFilter">
+                            <option value="">هەموو شوێنەکان</option>
+                        </select>
+                        <select class="form-control" id="statusFilter">
+                            <option value="">هەموو بارودۆخەکان</option>
+                            <option value="بەردەستە">بەردەستە</option>
+                            <option value="بەکارهێنراوە">بەکارهێنراوە</option>
+                            <option value="چاککردن">چاککردن</option>
+                            <option value="لەناوچوو">لەناوچوو</option>
+                        </select>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ناوی شوێن</th>
+                                <th>جۆری کەل و پەل</th>
+                                <th>ژمارە</th>
+                                <th>بەرواری وەرگرتن</th>
+                                <th>بارودۆخ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assetsTableBody">
+                        </tbody>
+                    </table>
+
+                    <div id="noDataMessage" style="text-align: center; padding: 20px; color: #666; display: none;">
+                        هیچ کەل و پەلێک نەدۆزرایەوە
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLlHLpZ0S3_Ll93-h93Nyhx2kuXChH1Js",
+            authDomain: "school-cis-e188b.firebaseapp.com",
+            databaseURL: "https://school-cis-e188b-default-rtdb.firebaseio.com",
+            projectId: "school-cis-e188b",
+            storageBucket: "school-cis-e188b.firebasestorage.app",
+            messagingSenderId: "206651660812",
+            appId: "1:206651660812:web:5d9b06f66e1352e3b5ec29"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        console.log('Firebase initialized successfully with correct config');
+
+        // Elements
+        const loginPage = document.getElementById('loginPage');
+        const mainPage = document.getElementById('mainPage');
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const userEmail = document.getElementById('userEmail');
+
+        // Asset form elements
+        const assetForm = document.getElementById('assetForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+        const assetsTableBody = document.getElementById('assetsTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const locationFilter = document.getElementById('locationFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const printBtn = document.getElementById('printBtn');
+        const exportExcelBtn = document.getElementById('exportExcelBtn');
+        const noDataMessage = document.getElementById('noDataMessage');
+
+        // Tab elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        let allAssets = [];
+        let filteredAssets = [];
+
+        // پشکنینی بارودۆخی چوونەژوورەوە
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // بەکارهێنەر چووەتەژوورەوە
+                loginPage.style.display = 'none';
+                mainPage.style.display = 'block';
+                userEmail.textContent = user.email;
+                
+                // بارکردنی کەل و پەلەکان
+                loadAssets();
+            } else {
+                // بەکارهێنەر نەچووەتەژوورەوە
+                loginPage.style.display = 'flex';
+                mainPage.style.display = 'none';
+            }
+        });
+
+        // چوونەژوورەوە
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            // شاردنەوەی پەیامی هەڵە
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
+
+            // ناچالاککردنی دوگمە
+            loginBtn.disabled = true;
+            loadingSpinner.style.display = 'block';
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                // سەرکەوتوو بوو - Firebase خۆی دەگۆڕێتە پەڕەی سەرەکی
+            } catch (error) {
+                console.error('هەڵە لە چوونەژوورەوە:', error);
+                
+                let errorMsg = 'هەڵەیەک ڕوویدا!';
+                
+                switch(error.code) {
+                    case 'auth/invalid-email':
+                        errorMsg = 'ئیمەیڵ دروست نییە';
+                        break;
+                    case 'auth/user-not-found':
+                        errorMsg = 'ئەم ئیمەیڵە تۆمار نەکراوە';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMsg = 'وشەی نهێنی هەڵەیە';
+                        break;
+                    case 'auth/invalid-credential':
+                        errorMsg = 'ئیمەیڵ یان وشەی نهێنی هەڵەیە';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMsg = 'هەوڵی زۆر بۆ چوونەژوورەوە. تکایە دواتر هەوڵبدەرەوە';
+                        break;
+                    default:
+                        errorMsg = 'هەڵە لە چوونەژوورەوە: ' + error.message;
+                }
+                
+                errorMessage.textContent = errorMsg;
+                errorMessage.style.display = 'block';
+            } finally {
+                loginBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+            }
+        });
+
+        // دەرچوون
+        function logout() {
+            if (confirm('دڵنیایت لە دەرچوون؟')) {
+                auth.signOut();
+            }
+        }
+
+        // دانانی بەرواری ئەمڕۆ وەک بەرواری پێشگریمان
+        document.getElementById('acquisitionDate').valueAsDate = new Date();
+
+        // زیادکردنی کەل و پەل
+        assetForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const assetData = {
+                locationName: document.getElementById('locationName').value,
+                assetType: document.getElementById('assetType').value,
+                assetQuantity: parseInt(document.getElementById('assetQuantity').value),
+                acquisitionDate: document.getElementById('acquisitionDate').value,
+                status: document.getElementById('status').value,
+                timestamp: new Date().toISOString(),
+                userId: auth.currentUser.uid,
+                userEmail: auth.currentUser.email
+            };
+
+            submitBtn.disabled = true;
+            loadingSpinner.style.display = 'block';
+
+            const newAssetRef = database.ref('assets').push();
+            newAssetRef.set(assetData)
+                .then(() => {
+                    loadingSpinner.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    
+                    assetForm.reset();
+                    document.getElementById('acquisitionDate').valueAsDate = new Date();
+                    
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                    }, 2000);
+                    
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 5000);
+                    
+                    loadAssets();
+                })
+                .catch(error => {
+                    console.error('هەڵە لە زیادکردنی کەل و پەل: ', error);
+                    alert('هەڵە لە زیادکردنی کەل و پەل!');
+                    loadingSpinner.style.display = 'none';
+                    submitBtn.disabled = false;
+                });
+        });
+
+        // بارکردنی کەل و پەلەکان
+        function loadAssets() {
+            database.ref('assets').on('value', (snapshot) => {
+                allAssets = [];
+                snapshot.forEach((childSnapshot) => {
+                    const asset = childSnapshot.val();
+                    asset.id = childSnapshot.key;
+                    allAssets.push(asset);
+                });
+                
+                allAssets.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                filterAssets();
+            });
+        }
+
+        // فلتەرکردن
+        function filterAssets() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedLocation = locationFilter.value;
+            const selectedStatus = statusFilter.value;
+            
+            filteredAssets = allAssets.filter(asset => {
+                const matchesSearch = !searchTerm || 
+                    asset.locationName.toLowerCase().includes(searchTerm) ||
+                    asset.assetType.toLowerCase().includes(searchTerm);
+                
+                const matchesLocation = !selectedLocation || asset.locationName === selectedLocation;
+                const matchesStatus = !selectedStatus || asset.status === selectedStatus;
+                
+                return matchesSearch && matchesLocation && matchesStatus;
+            });
+            
+            displayAssets();
+        }
+
+        // نیشاندانی کەل و پەلەکان
+        function displayAssets() {
+            assetsTableBody.innerHTML = '';
+            
+            if (filteredAssets.length === 0) {
+                noDataMessage.style.display = 'block';
+                return;
+            }
+            
+            noDataMessage.style.display = 'none';
+            
+            filteredAssets.forEach((asset, index) => {
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                switch(asset.status) {
+                    case 'بەردەستە':
+                        statusClass = 'status-available';
+                        break;
+                    case 'بەکارهێنراوە':
+                        statusClass = 'status-used';
+                        break;
+                    case 'چاککردن':
+                        statusClass = 'status-repair';
+                        break;
+                    case 'لەناوچوو':
+                        statusClass = 'status-lost';
+                        break;
+                }
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${asset.locationName}</td>
+                    <td>${asset.assetType}</td>
+                    <td>${asset.assetQuantity}</td>
+                    <td>${formatDate(asset.acquisitionDate)}</td>
+                    <td class="${statusClass}">${asset.status}</td>
+                `;
+                
+                assetsTableBody.appendChild(row);
+            });
+        }
+
+        // ڕێکخستنی بەروار
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ku-Arab');
+        }
+
+        // چاپکردن
+        printBtn.addEventListener('click', () => {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html dir="rtl">
+                <head>
+                    <title>چاپی کەل و پەلەکان</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { text-align: center; color: #1565c0; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { padding: 10px; border: 1px solid #ddd; text-align: right; }
+                        th { background-color: #1565c0; color: white; }
+                        tr:nth-child(even) { background-color: #f2f2f2; }
+                    </style>
+                </head>
+                <body>
+                    <h1>کەل و پەلەکانی پەیمانگەی کۆمپیوتەری سلێمانی</h1>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ناوی شوێن</th>
+                                <th>جۆری کەل و پەل</th>
+                                <th>ژمارە</th>
+                                <th>بەرواری وەرگرتن</th>
+                                <th>بارودۆخ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredAssets.map((asset, index) => `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${asset.locationName}</td>
+                                    <td>${asset.assetType}</td>
+                                    <td>${asset.assetQuantity}</td>
+                                    <td>${formatDate(asset.acquisitionDate)}</td>
+                                    <td>${asset.status}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <p style="text-align: center; margin-top: 30px;">بەرواری چاپ: ${new Date().toLocaleDateString('ku-Arab')}</p>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        });
+
+        // دەرهێنانی Excel
+        exportExcelBtn.addEventListener('click', () => {
+            const excelData = filteredAssets.map((asset, index) => ({
+                'ژمارە': index + 1,
+                'ناوی شوێن': asset.locationName,
+                'جۆری کەل و پەل': asset.assetType,
+                'ژمارە': asset.assetQuantity,
+                'بەرواری وەرگرتن': formatDate(asset.acquisitionDate),
+                'بارودۆخ': asset.status
+            }));
+            
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'کەل و پەلەکان');
+            
+            XLSX.writeFile(workbook, `کەل_و_پەلەکانی_پەیمانگە_${new Date().toISOString().split('T')[0]}.xlsx`);
+        });
+
+        // گۆڕینی تابەکان
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+                
+                if (tabId === 'viewAssets') {
+                    filterAssets();
+                }
+            });
+        });
+
+        // گوێگرتنی گۆڕانکاریەکان
+        searchInput.addEventListener('input', filterAssets);
+        locationFilter.addEventListener('change', filterAssets);
+        statusFilter.addEventListener('change', filterAssets);
+    </script>
+</body>
+</html>

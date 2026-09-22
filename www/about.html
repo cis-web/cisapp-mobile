@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دەربارە و پەیوەندی - CIS Sulaimany</title>
+
+    <link rel="icon" type="image/jpeg" href="logo-cis.jpg">
+    <meta name="theme-color" content="#00bfff">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #00bfff;
+            --primary-dark: #008ab8;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 24px 16px;
+            text-align: center;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        .institute-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 3px solid #fff;
+            background: #fff;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .header h1 { color: white; font-size: 17px; font-weight: 700; }
+
+        .content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 16px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .card h2 {
+            font-size: 16px;
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.8;
+        }
+
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .contact-row:last-child { border-bottom: none; }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0f7ff;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .contact-text .label { font-size: 12px; color: var(--text-gray); }
+        .contact-text .value { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+
+        .social-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-bg);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .social-links a:hover { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i></a>
+        <img src="logo-cis.jpg" class="institute-logo" alt="لۆگۆ">
+        <h1>پەیمانگەی کۆمپیوتەری سلێمانی</h1>
+    </div>
+
+    <div class="content">
+        <div class="card">
+            <h2><i class="fas fa-info-circle"></i> دەربارەی پەیمانگا</h2>
+            <p>
+                پەیمانگەی کۆمپیوتەری سلێمانی یەکێکە لە پەیمانگە حکومی زانستی سەر بە  وەزارەتی پەروەردە، کە خزمەتی فێرکردنی زانستی کۆمپیوتەر و تەکنەلۆژیای زانیاری دەکات بۆ خوێندکاران.
+                ئامانجمان بەخشینی خوێندنێکی کوالیتی بەرزە بۆ ئامادەکردنی نەوەیەکی شارەزا لە بواری تەکنەلۆژیا.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-address-book"></i> زانیاری پەیوەندی</h2>
+
+            <div class="contact-row">
+                <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="contact-text">
+                    <div class="label">ناونیشان</div>
+                    <div class="value">سلێمانی - کوردستان - عێراق</div>
+                </div>
+            </div>
+
+            <div class="contact-row">
+                <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                <div class="contact-text">
+                    <div class="label">ژمارە پەیوەندی</div>
+                    <div class="value">0533288888</div>
+                </div>
+            </div>
+
+            <div class="contact-row">
+                <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                <div class="contact-text">
+                    <div class="label">ئیمەیل</div>
+                    <div class="value">schoolfordesign@gmail.com</div>
+                </div>
+            </div>
+
+            <div class="contact-row">
+                <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                <div class="contact-text">
+                    <div class="label">کاتی کارکردن</div>
+                    <div class="value">یەک شەممە - پێنجشەممە | ٨:٠٠ بەیانی - ٢:٠٠ ئێوارە</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-share-alt"></i> پەیوەندی </h2>
+            <div class="social-links">
+                <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a href="#" title="Telegram"><i class="fab fa-telegram"></i></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

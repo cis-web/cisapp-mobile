@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>داشبۆردی فەرمانبەر - CIS Sulaimany</title>
+
+    <link rel="icon" type="image/jpeg" href="logo-cis.jpg">
+    <meta name="theme-color" content="#27A7E7">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #27A7E7;
+            --primary-dark: #1f8dc4;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        /* ===== Login ===== */
+        #loginPage {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        .login-box {
+            background: white;
+            border-radius: 18px;
+            padding: 36px 28px;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        .institute-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 3px solid var(--primary);
+            padding: 5px;
+            margin-bottom: 12px;
+        }
+        .login-box h1 { font-size: 18px; color: var(--primary); margin-bottom: 6px; }
+        .login-box p { font-size: 13px; color: var(--text-gray); margin-bottom: 22px; }
+        .form-group { text-align: right; margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .error-msg {
+            display: none;
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 18px;
+            font-size: 13px;
+            color: var(--text-gray);
+            text-decoration: none;
+        }
+
+        /* ===== Dashboard ===== */
+        #dashboardPage { display: none; }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 22px 16px;
+            text-align: center;
+            position: relative;
+        }
+        .header .institute-logo { border-color: white; background: white; }
+        .header h1 { color: white; font-size: 17px; margin-bottom: 2px; }
+        .header p { color: rgba(255,255,255,0.9); font-size: 12px; }
+        .logout-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .content { max-width: 600px; margin: 0 auto; padding: 24px 16px 40px; }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .empty-state { text-align: center; padding: 40px 16px; color: var(--text-gray); }
+        .empty-state i { font-size: 40px; color: #cbd5e1; margin-bottom: 12px; display: block; }
+
+        .msg-reply-box textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+        }
+        .msg-send-reply-btn {
+            margin-top: 6px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .msg-mark-read-btn {
+            border: none;
+            background: #10b981;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .msg-reply-toggle-btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== Login Page ===== -->
+    <div id="loginPage">
+        <div class="login-box">
+            <img src="logo-cis.jpg" class="institute-logo" alt="لۆگۆ">
+            <h1>داشبۆردی فەرمانبەر</h1>
+            <p>تکایە ناوی بەکارهێنەر و وشەی نهێنیت بنووسە</p>
+
+            <div class="error-msg" id="errorMsg">
+                <i class="fas fa-exclamation-circle"></i> ناوی بەکارهێنەر یان وشەی نهێنی هەڵەیە
+            </div>
+
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> ناوی بەکارهێنەر</label>
+                    <input type="text" id="username" placeholder="ناوی بەکارهێنەر" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> وشەی نهێنی</label>
+                    <input type="password" id="password" placeholder="وشەی نهێنی" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> چوونەژوورەوە
+                </button>
+            </form>
+
+            <button type="button" class="login-btn" style="background:white; color:var(--primary); border:2px solid var(--primary); margin-top:12px;" onclick="openQRScanner()">
+                <i class="fas fa-qrcode"></i> سکانی بارکۆد بۆ چوونەژوورەوە
+            </button>
+
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i> گەڕانەوە بۆ سەرەکی</a>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qrScannerModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:9000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:white; border-radius:16px; padding:20px; max-width:340px; width:100%; text-align:center; position:relative;">
+            <button onclick="closeQRScanner()" style="position:absolute; top:10px; left:10px; width:32px; height:32px; border-radius:50%; border:none; background:var(--light-bg); color:var(--text-gray); font-size:16px; cursor:pointer;"><i class="fas fa-times"></i></button>
+            <p style="margin-bottom:10px; font-weight:600;">بارکۆدەکە بخەرە ناو چوارچێوەکە</p>
+            <video id="qrVideo" playsinline style="width:100%; border-radius:12px; background:#000;"></video>
+            <canvas id="qrCanvas" style="display:none;"></canvas>
+            <p id="qrScanStatus" style="margin-top:10px; font-size:13px; color:var(--text-gray);">چاوەڕێی کامێرا...</p>
+        </div>
+    </div>
+
+    <!-- ===== Dashboard ===== -->
+    <div id="dashboardPage">
+        <div class="header">
+            <button class="logout-btn" onclick="logout()" title="چوونەدەرەوە"><i class="fas fa-sign-out-alt"></i></button>
+            <img src="logo-cis.jpg" class="institute-logo" alt="لۆگۆ">
+            <h1 id="welcomeText">بەخێربێیت</h1>
+            <p>فەرمانبەری پەیمانگا</p>
+        </div>
+
+        <div class="content">
+            <h2 style="font-size:16px; margin-bottom:14px;"><i class="fas fa-envelope" style="color:var(--primary);"></i> پەیامەکانم لە بەڕێوەبەرەوە</h2>
+            <div id="employeeMessagesList">
+                <p style="text-align:center; color:var(--text-gray); padding:20px;">بارکردن...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLlHLpZ0S3_Ll93-h93Nyhx2kuXChH1Js",
+            authDomain: "school-cis-e188b.firebaseapp.com",
+            databaseURL: "https://school-cis-e188b-default-rtdb.firebaseio.com",
+            projectId: "school-cis-e188b",
+            storageBucket: "school-cis-e188b.firebasestorage.app",
+            messagingSenderId: "206651660812",
+            appId: "1:206651660812:web:5d9b06f66e1352e3b5ec29"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let currentEmployee = null;
+
+        // ===== Auto login =====
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('employeeLogin');
+            if (saved) {
+                const { username, password } = JSON.parse(saved);
+                attemptLogin(username, password, true);
+            }
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            attemptLogin(username, password, false);
+        }
+
+        function attemptLogin(username, password, isAuto) {
+            database.ref('employees/' + username).once('value', (snapshot) => {
+                const employee = snapshot.val();
+                if (employee && employee.password === password) {
+                    currentEmployee = { username, ...employee };
+                    localStorage.setItem('employeeLogin', JSON.stringify({ username, password }));
+                    oneSignalSetIdentity(username, 'employee');
+                    showDashboard();
+                } else if (!isAuto) {
+                    document.getElementById('errorMsg').style.display = 'block';
+                } else {
+                    localStorage.removeItem('employeeLogin');
+                }
+            }, () => {
+                if (!isAuto) document.getElementById('errorMsg').style.display = 'block';
+            });
+        }
+
+        // ===== QR Code Scanner =====
+        let qrStream = null;
+        let qrScanInterval = null;
+
+        function openQRScanner() {
+            document.getElementById('qrScannerModal').style.display = 'flex';
+            document.getElementById('qrScanStatus').textContent = 'چاوەڕێی کامێرا...';
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    qrStream = stream;
+                    const video = document.getElementById('qrVideo');
+                    video.srcObject = stream;
+                    video.setAttribute('playsinline', true);
+                    video.play();
+                    document.getElementById('qrScanStatus').textContent = 'بارکۆدەکە بخەرە بەردەم کامێرا';
+                    qrScanInterval = setInterval(scanQRFrame, 300);
+                })
+                .catch(() => {
+                    document.getElementById('qrScanStatus').textContent = 'نەتوانرا دەستگەیشتن بە کامێرا بکرێت.';
+                });
+        }
+
+        function scanQRFrame() {
+            const video = document.getElementById('qrVideo');
+            const canvas = document.getElementById('qrCanvas');
+            if (!video.videoWidth) return;
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+                try {
+                    const parsed = JSON.parse(code.data);
+                    if (parsed.u && parsed.p) {
+                        closeQRScanner();
+                        document.getElementById('username').value = parsed.u;
+                        document.getElementById('password').value = parsed.p;
+                        attemptLogin(parsed.u, parsed.p, false);
+                        return;
+                    }
+                } catch (e) {
+                    document.getElementById('qrScanStatus').textContent = 'ئەم بارکۆدە بۆ چوونەژوورەوە نییە';
+                }
+            }
+        }
+
+        function closeQRScanner() {
+            document.getElementById('qrScannerModal').style.display = 'none';
+            if (qrScanInterval) { clearInterval(qrScanInterval); qrScanInterval = null; }
+            if (qrStream) {
+                qrStream.getTracks().forEach(track => track.stop());
+                qrStream = null;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('employeeLogin');
+            currentEmployee = null;
+            oneSignalClearIdentity();
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showDashboard() {
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'block';
+            document.getElementById('welcomeText').textContent = 'بەخێربێیت ' + currentEmployee.name;
+            loadEmployeeMessages();
+        }
+
+        // ===== Messages from admin =====
+        let employeeMessagesRecords = [];
+
+        function loadEmployeeMessages() {
+            if (!currentEmployee) return;
+            database.ref('staffMessages').on('value', (snapshot) => {
+                const data = snapshot.val();
+                employeeMessagesRecords = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const m = { id: key, ...data[key] };
+                        if (m.staffName === currentEmployee.username) {
+                            employeeMessagesRecords.push(m);
+                        }
+                    });
+                }
+                employeeMessagesRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+                renderEmployeeMessages();
+            });
+        }
+
+        function renderEmployeeMessages() {
+            const list = document.getElementById('employeeMessagesList');
+            if (!list) return;
+            list.innerHTML = '';
+
+            if (employeeMessagesRecords.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="fas fa-envelope-open"></i>هیچ پەیامێکت نییە</div>';
+                return;
+            }
+
+            employeeMessagesRecords.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.borderRight = `4px solid ${m.read ? '#cbd5e1' : '#db2777'}`;
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                        <span style="font-weight:700; font-size:14px;"><i class="fas fa-user-shield"></i> ${m.senderName}</span>
+                        ${m.read ? '' : '<span style="background:#fce7f3; color:#db2777; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:700;">نوێ</span>'}
+                    </div>
+                    <div style="font-size:14px; color:var(--text-dark); background:var(--light-bg); padding:10px; border-radius:8px; margin-bottom:10px;">${m.message}</div>
+                    ${m.reply ? `<div style="font-size:13px; color:#047857; background:#d1fae5; padding:10px; border-radius:8px; margin-bottom:10px;"><strong><i class="fas fa-reply"></i> وەڵامی تۆ:</strong> ${m.reply}</div>` : ''}
+                    ${(!m.reply) ? `
+                    <div class="msg-reply-box" id="replyBox-${m.id}" style="display:none; margin-bottom:10px;">
+                        <textarea id="replyText-${m.id}" rows="3" placeholder="وەڵامەکەت بنووسە..."></textarea>
+                        <button class="msg-send-reply-btn" onclick="sendEmployeeReply('${m.id}')"><i class="fas fa-paper-plane"></i> ناردنی وەڵام</button>
+                    </div>` : ''}
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11px; color:var(--text-gray);">${new Date(m.date).toLocaleString('ku')}</span>
+                        <div style="display:flex; gap:8px;">
+                            ${(!m.reply) ? `<button class="msg-reply-toggle-btn" onclick="toggleEmployeeReplyBox('${m.id}')"><i class="fas fa-reply"></i> وەڵامدانەوە</button>` : ''}
+                            ${m.read ? '' : `<button class="msg-mark-read-btn" onclick="markEmployeeMessageRead('${m.id}')"><i class="fas fa-check"></i> خوێندمەوە</button>`}
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function toggleEmployeeReplyBox(id) {
+            const box = document.getElementById('replyBox-' + id);
+            if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function sendEmployeeReply(id) {
+            const textEl = document.getElementById('replyText-' + id);
+            const replyText = textEl.value.trim();
+            if (!replyText) {
+                alert('تکایە وەڵامەکەت بنووسە');
+                return;
+            }
+            database.ref('staffMessages/' + id).update({
+                reply: replyText,
+                replyDate: new Date().toISOString(),
+                read: true
+            }).then(() => {
+                sendPushNotification({ externalId: 'admin' }, 'وەڵامی نوێ لە فەرمانبەر', replyText);
+            }).catch(() => {
+                alert('نەتوانرا وەڵامەکە بنێردرێت');
+            });
+        }
+
+        function markEmployeeMessageRead(id) {
+            database.ref('staffMessages/' + id).update({ read: true });
+        }
+    </script>
+    <script src="onesignal-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "cis-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.2.2",
+    "@capgo/capacitor-native-biometric": "^6.0.4",
+    "cordova-plugin-cis-appsettings": "file:./cordova-plugin-cis-appsettings",
+    "onesignal-cordova-plugin": "^5.5.1"
+  }
+}

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چالاککردنی ئاگاداری - CIS Sulaimany</title>
+
+    <link rel="icon" type="image/jpeg" href="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107">
+    <meta name="theme-color" content="#00bfff">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #00bfff;
+            --primary-dark: #008ab8;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.7;
+            color: var(--text-dark);
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 24px 16px;
+            text-align: center;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        .institute-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 3px solid #fff;
+            background: #fff;
+            padding: 5px;
+            margin-bottom: 8px;
+        }
+        .header h1 { color: white; font-size: 17px; font-weight: 700; margin-bottom: 2px; }
+        .header p { color: rgba(255,255,255,0.9); font-size: 12px; }
+        .content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px 16px 50px;
+        }
+
+        /* ---- Activation card ---- */
+        .activate-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.07);
+            text-align: center;
+        }
+        .activate-card i.bell-icon {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: block;
+        }
+        .activate-card h2 { font-size: 16px; margin-bottom: 6px; }
+        .activate-card p { font-size: 13px; color: var(--text-gray); margin-bottom: 16px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 10px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:active { transform: scale(0.98); background: var(--primary-dark); }
+        .btn-secondary { background: var(--light-bg); color: var(--text-dark); border: 1px solid var(--border); }
+        .btn-secondary:active { transform: scale(0.98); }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+        }
+        .status-badge.granted { background: #dcfce7; color: #15803d; }
+        .status-badge.denied { background: #fee2e2; color: #b91c1c; }
+        .status-badge.unknown { background: #fff7ed; color: #c2410c; }
+        .status-badge.web { background: #e0f2fe; color: #0369a1; }
+
+        /* ---- Detected device notice ---- */
+        .detect-notice {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 13px;
+            color: #0369a1;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .detect-notice i { font-size: 18px; }
+
+        /* ---- Guide sections (accordion) ---- */
+        .section-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .tab-btn {
+            flex-shrink: 0;
+            padding: 9px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-gray);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .guide-card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            display: none;
+        }
+        .guide-card.active { display: block; }
+        .guide-card h3 {
+            font-size: 15px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-dark);
+        }
+        .guide-card h3 i { font-size: 16px; }
+        .guide-sub {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 14px 0 8px;
+            color: var(--text-dark);
+        }
+        .guide-sub:first-of-type { margin-top: 10px; }
+        .step-list {
+            list-style: none;
+            counter-reset: step;
+        }
+        .step-list li {
+            counter-increment: step;
+            font-size: 13.5px;
+            color: var(--text-gray);
+            padding-right: 32px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .step-list li::before {
+            content: counter(step);
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .important-note {
+            background: #fff7ed;
+            border-right: 3px solid var(--warning);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12.5px;
+            color: #9a3412;
+            margin-top: 10px;
+        }
+        .settings-shortcut {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            font-size: 12.5px;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .settings-shortcut button {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .general-tips {
+            background: white;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            border-right: 4px solid var(--primary);
+        }
+        .general-tips h3 { font-size: 14px; margin-bottom: 10px; }
+        .general-tips ul { padding-right: 18px; }
+        .general-tips li { font-size: 13px; color: var(--text-gray); margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i></a>
+        <img src="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107" class="institute-logo" alt="لۆگۆ">
+        <h1><i class="fas fa-bell"></i> چالاککردنی ئاگاداری</h1>
+        <p>ڕێنمایی وەرگرتنی Notification لەسەر مۆبایل</p>
+    </div>
+
+    <div class="content">
+
+        <!-- ============ Activation Card ============ -->
+        <div class="activate-card">
+            <i class="fas fa-bell bell-icon"></i>
+            <h2>ئاگاداری چالاکە؟</h2>
+            <p>یەک کرتە بکە تاکو دڵنیابیت ئاگاداریەکانی پەیمانگا بۆت دەگات.</p>
+
+            <div id="statusBadge" class="status-badge unknown">
+                <i class="fas fa-circle-question"></i>
+                <span id="statusText">پشکنین ناکرێت...</span>
+            </div>
+            <br>
+
+            <button class="btn btn-primary" id="activateBtn" onclick="activateNotifications()">
+                <i class="fas fa-bell"></i> چالاککردنی ئاگاداری
+            </button>
+            <button class="btn btn-secondary" id="batteryBtn" onclick="requestBatteryExemption()" style="display:none;">
+                <i class="fas fa-battery-full"></i> لادانی سنووردارکردنی باتەری
+            </button>
+            <button class="btn btn-secondary" id="openSettingsBtn" onclick="openAppSettings()" style="display:none;">
+                <i class="fas fa-gear"></i> کردنەوەی ڕێکخستنەکانی ئەپ
+            </button>
+        </div>
+
+        <!-- Shown only on first app launch (notification-setup.html?first=1) -->
+        <div class="activate-card" id="firstRunContinue" style="display:none;">
+            <p style="margin-bottom:12px;">کاتێک ڕێکخستنەکانت تەواو کرد، دەتوانیت بەردەوام بیت.</p>
+            <button class="btn btn-primary" onclick="finishFirstRun()">
+                <i class="fas fa-arrow-left"></i> بەردەوامبوون بۆ ئەپ
+            </button>
+        </div>
+
+        <div class="detect-notice" id="detectNotice" style="display:none;">
+            <i class="fas fa-mobile-screen"></i>
+            <span id="detectText"></span>
+        </div>
+
+        <!-- ============ Brand Tabs ============ -->
+        <div class="section-tabs" id="tabs">
+            <button class="tab-btn" data-target="samsung" onclick="showGuide('samsung')">سامسۆنگ</button>
+            <button class="tab-btn" data-target="xiaomi" onclick="showGuide('xiaomi')">شاومی / ڕێدمی</button>
+            <button class="tab-btn" data-target="huawei" onclick="showGuide('huawei')">هواوی</button>
+            <button class="tab-btn" data-target="other" onclick="showGuide('other')">مۆبایلی تر</button>
+        </div>
+
+        <!-- ============ Samsung ============ -->
+        <div class="guide-card" id="guide-samsung">
+            <h3><i class="fas fa-mobile-screen-button"></i> سامسۆنگ / گەلاکسی</h3>
+
+            <div class="guide-sub">١. چالاککردنی ئاگاداری</div>
+            <ul class="step-list">
+                <li>بڕۆ بۆ ڕێکخستنەکان (Settings) ← ئەپەکان (Apps).</li>
+                <li>لیستەکەدا ئەپی پەیمانگا (CIS) هەڵبژێرە.</li>
+                <li>کرتە لەسەر Notifications بکە و دڵنیابەرەوە کرداری سەرەکی و هەموو جۆرەکانی ئاگاداری کراونەتەوە.</li>
+            </ul>
+
+            <div class="guide-sub">٢. لابردنی سنووردارکردنی باتەری</div>
+            <ul class="step-list">
+                <li>لە هەمان لاپەڕەی ئەپەکە، کرتە لەسەر Battery بکە.</li>
+                <li>بژاردەی Unrestricted هەڵبژێرە — نەک Optimized یان Restricted.</li>
+                <li>بگەڕێوە بۆ ڕێکخستنەکان ← Battery and device care ← Background usage limits.</li>
+                <li>ئەگەر ئەپەکە لەناو لیستی Sleeping apps دایە، لایبدە؛ باشترە بیخەیتە ناو Never sleeping apps.</li>
+            </ul>
+
+            <div class="guide-sub">٣. قوفڵکردنی ئەپ لە لیستی ئەپە کراوەکان</div>
+            <ul class="step-list">
+                <li>دوگمەی Recent apps بگرە.</li>
+                <li>لەسەر وێنۆچکەی ئەپەکە کرتە بکە و دوگمەی قوفڵ (Lock) چالاک بکە.</li>
+            </ul>
+
+            <div class="settings-shortcut">
+                <span>دەتوانیت ڕاستەوخۆ لاپەڕەی ڕێکخستنی ئەپ بکەیتەوە</span>
+                <button onclick="openAppSettings()">کردنەوە</button>
+            </div>
+        </div>
+
+        <!-- ============ Xiaomi ============ -->
+        <div class="guide-card" id="guide-xiaomi">
+            <h3><i class="fas fa-mobile-screen-button"></i> شاومی / ڕێدمی (MIUI)</h3>
+            <div class="important-note">
+                لەسەر مۆبایلی شاومی/ڕێدمی، هەنگاوی <strong>Autostart</strong> زۆر گرنگە — بەبێ ئەوە ئاگاداری ناگاتێ.
+            </div>
+
+            <div class="guide-sub">١. چالاککردنی ئاگاداری</div>
+            <ul class="step-list">
+                <li>ڕێکخستنەکان ← ئەپەکان (Apps) ← بەڕێوەبردنی ئەپەکان (Manage apps).</li>
+                <li>ئەپی پەیمانگا هەڵبژێرە ← Notifications ← چالاکی بکە.</li>
+            </ul>
+
+            <div class="guide-sub">٢. چالاککردنی Autostart</div>
+            <ul class="step-list">
+                <li>ڕێکخستنەکان ← ئەپەکان ← ڕێکخستنی زیاتر (Permissions) ← Autostart.</li>
+                <li>بگەڕێ بۆ ئەپی پەیمانگا و دوگمەکەی چالاک بکە.</li>
+            </ul>
+
+            <div class="guide-sub">٣. لابردنی سنووردارکردنی باتەری</div>
+            <ul class="step-list">
+                <li>ڕێکخستنەکان ← باتەری (Battery) ← App battery saver.</li>
+                <li>ئەپی پەیمانگا هەڵبژێرە و No restrictions هەڵبژێرە.</li>
+            </ul>
+
+            <div class="guide-sub">٤. قوفڵکردنی ئەپ</div>
+            <ul class="step-list">
+                <li>لە لیستی Recent apps، بۆ خوارەوە swipe بکە بۆ دەرکەوتنی دوگمەی قوفڵ و کرتەی لێ بکە.</li>
+            </ul>
+
+            <div class="settings-shortcut">
+                <span>دەتوانیت ڕاستەوخۆ لاپەڕەی ڕێکخستنی ئەپ بکەیتەوە</span>
+                <button onclick="openAppSettings()">کردنەوە</button>
+            </div>
+        </div>
+
+        <!-- ============ Huawei ============ -->
+        <div class="guide-card" id="guide-huawei">
+            <h3><i class="fas fa-mobile-screen-button"></i> هواوی (EMUI)</h3>
+
+            <div class="guide-sub">١. چالاککردنی ئاگاداری</div>
+            <ul class="step-list">
+                <li>ڕێکخستنەکان ← ئەپەکان (Apps) ← ئەپی پەیمانگا ← Notifications ← چالاکی بکە.</li>
+            </ul>
+
+            <div class="guide-sub">٢. ڕێکخستنی دەستپێکردنی خۆکاری (App launch)</div>
+            <ul class="step-list">
+                <li>ڕێکخستنەکان ← باتەری (Battery) ← App launch.</li>
+                <li>بۆ ئەپی پەیمانگا، کرداری خۆکار (Manage automatically) لابدە.</li>
+                <li>هەر سێ بژاردەکە چالاک بکە: Auto-launch، Secondary launch، Run in background.</li>
+            </ul>
+
+            <div class="guide-sub">٣. قوفڵکردنی ئەپ</div>
+            <ul class="step-list">
+                <li>لە لیستی ئەپە کراوەکان، ئەپەکە قوفڵ بکە وەک لە سامسۆنگدا باسکرا.</li>
+            </ul>
+
+            <div class="settings-shortcut">
+                <span>دەتوانیت ڕاستەوخۆ لاپەڕەی ڕێکخستنی ئەپ بکەیتەوە</span>
+                <button onclick="openAppSettings()">کردنەوە</button>
+            </div>
+        </div>
+
+        <!-- ============ Other ============ -->
+        <div class="guide-card" id="guide-other">
+            <h3><i class="fas fa-mobile-screen-button"></i> مۆبایلی تر</h3>
+            <ul class="step-list">
+                <li>بڕۆ بۆ ڕێکخستنەکان ← ئەپەکان ← ئەپی پەیمانگا (CIS)، و دڵنیابەرەوە Notifications چالاکە.</li>
+                <li>لە بەشی باتەری، هەوڵبدە هەر جۆرە سنووردارکردنێکی باتەری بۆ ئەم ئەپە لابدەیت (Unrestricted / No optimization).</li>
+                <li>ئەگەر بژاردەی Autostart یان Background activity هەبوو، چالاکی بکە.</li>
+            </ul>
+            <div class="settings-shortcut">
+                <span>دەتوانیت ڕاستەوخۆ لاپەڕەی ڕێکخستنی ئەپ بکەیتەوە</span>
+                <button onclick="openAppSettings()">کردنەوە</button>
+            </div>
+        </div>
+
+        <!-- ============ General tips ============ -->
+        <div class="general-tips">
+            <h3><i class="fas fa-circle-info"></i> تێبینی گشتی بۆ هەموو مۆبایلێک</h3>
+            <ul>
+                <li>پێویستە ئینتەرنێت (Wi-Fi یان داتا) هەمیشە چالاک بێت بۆ وەرگرتنی ئاگاداری.</li>
+                <li>پاش گۆڕینی هەر ڕێکخستنێک، باشترە مۆبایلەکە دووبارە دەستپێبکرێتەوە (Restart).</li>
+                <li>ئەگەر دیسان ئاگاداری نەگەیشت، ئەپەکە بسڕەوە و دووبارە دامەزرێنە، پاشان جارێکی تر بچۆرەژوورەوە.</li>
+                <li>زۆربەی ئەم کێشانە کێشەی مۆبایلەکەیە نەک ئەپەکە — بۆیە ڕێکخستنەکانی سەرەوە زۆر گرنگن.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        /* ==================================================================
+           1) Auto-detect device brand & pre-select relevant guide tab
+           ================================================================== */
+        function detectBrand() {
+            // Best effort: try Cordova "device" plugin first (most accurate),
+            // fall back to userAgent sniffing if it's not installed.
+            let manufacturer = '';
+            if (window.device && window.device.manufacturer) {
+                manufacturer = String(window.device.manufacturer).toLowerCase();
+            } else {
+                manufacturer = navigator.userAgent.toLowerCase();
+            }
+
+            if (manufacturer.includes('samsung')) return 'samsung';
+            if (manufacturer.includes('xiaomi') || manufacturer.includes('redmi') || manufacturer.includes('poco')) return 'xiaomi';
+            if (manufacturer.includes('huawei') || manufacturer.includes('honor')) return 'huawei';
+            return 'other';
+        }
+
+        let currentGuide = 'other';
+
+        function showGuide(brand) {
+            currentGuide = brand;
+            document.querySelectorAll('.guide-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('guide-' + brand).classList.add('active');
+            document.querySelector('.tab-btn[data-target="' + brand + '"]').classList.add('active');
+        }
+
+        (function initDetection() {
+            const detected = detectBrand();
+            showGuide(detected);
+
+            const names = { samsung: 'سامسۆنگ', xiaomi: 'شاومی/ڕێدمی', huawei: 'هواوی', other: 'مۆبایلەکەت' };
+            if (detected !== 'other') {
+                const notice = document.getElementById('detectNotice');
+                notice.style.display = 'flex';
+                document.getElementById('detectText').textContent =
+                    'بەپێی مۆبایلەکەت، بەشی ' + names[detected] + ' خۆکارانە کراوەتەوە.';
+            }
+        })();
+
+        /* ==================================================================
+           2) One-tap permission activation (OneSignal)
+           ================================================================== */
+        function hasOneSignal() {
+            return !!(window.plugins && window.plugins.OneSignal);
+        }
+
+        function setStatus(state, text) {
+            const badge = document.getElementById('statusBadge');
+            badge.className = 'status-badge ' + state;
+            const icon = {
+                granted: 'fa-circle-check',
+                denied: 'fa-circle-xmark',
+                unknown: 'fa-circle-question',
+                web: 'fa-globe'
+            }[state] || 'fa-circle-question';
+            badge.innerHTML = '<i class="fas ' + icon + '"></i> <span>' + text + '</span>';
+        }
+
+        function hasCISPlugin() {
+            return !!(window.cordova && cordova.plugins && cordova.plugins.cisAppSettings);
+        }
+
+        async function refreshStatus() {
+            if (!hasOneSignal()) {
+                setStatus('web', 'ئەم لاپەڕەیە لە وێبگەڕدایە — لە ئەپەکە کرتەی چالاککردن بکە');
+                return;
+            }
+            try {
+                const OneSignal = window.plugins.OneSignal;
+                const granted = await OneSignal.Notifications.permission;
+                if (granted) {
+                    setStatus('granted', 'ئاگاداری چالاکە ✓');
+                    document.getElementById('activateBtn').style.display = 'none';
+                } else {
+                    setStatus('denied', 'ئاگاداری چالاک نییە');
+                    document.getElementById('openSettingsBtn').style.display = 'inline-flex';
+                }
+            } catch (e) {
+                setStatus('unknown', 'ناتوانرێت دۆخەکە بزانرێت');
+            }
+
+            // Battery-optimization shortcut: only meaningful on Android,
+            // and only shown if the app isn't exempt yet.
+            if (hasCISPlugin()) {
+                try {
+                    const ignoring = await cordova.plugins.cisAppSettings.isIgnoringBatteryOptimizations();
+                    document.getElementById('batteryBtn').style.display = ignoring ? 'none' : 'inline-flex';
+                } catch (e) {
+                    document.getElementById('batteryBtn').style.display = 'inline-flex';
+                }
+            }
+        }
+
+        async function activateNotifications() {
+            if (!hasOneSignal()) {
+                alert('تکایە ئەم پەڕەیە لەناو ئەپی مۆبایل بکەرەوە (نەک وێبگەڕی ئاسایی) تاکو بتوانیت ئاگاداری چالاک بکەیت.');
+                return;
+            }
+            try {
+                const OneSignal = window.plugins.OneSignal;
+                await OneSignal.Notifications.requestPermission(true);
+                await refreshStatus();
+                // If still not granted after the prompt, the user likely denied
+                // it before — show the "open settings" shortcut.
+                const granted = await OneSignal.Notifications.permission;
+                if (!granted) {
+                    document.getElementById('openSettingsBtn').style.display = 'inline-flex';
+                }
+            } catch (e) {
+                console.error('requestPermission error:', e);
+                alert('هەڵەیەک ڕوویدا لە چالاککردنی ئاگاداری. تکایە بەشی ڕێکخستنەکانی خوارەوە بەکاربهێنە.');
+            }
+        }
+
+        /* ==================================================================
+           3) Direct link to the app's OS settings page (best-effort)
+           ------------------------------------------------------------------
+           This only works if a Cordova/Capacitor settings-opener plugin is
+           installed in the app (e.g. cordova-plugin-app-preferences,
+           cordova-open-native-settings, or @capacitor/app on newer
+           Capacitor versions). We feature-detect several known plugin
+           shapes; if none exist, we simply fall back to on-screen manual
+           instructions instead of failing silently.
+           ================================================================== */
+        function openAppSettings() {
+            try {
+                // Preferred: our own cordova-plugin-cis-appsettings, which
+                // opens the *notification* settings screen directly rather
+                // than the generic app-info page.
+                if (hasCISPlugin()) {
+                    cordova.plugins.cisAppSettings.openNotificationSettings().catch(function () {
+                        cordova.plugins.cisAppSettings.openAppDetailsSettings().catch(function (e) {
+                            console.error('openAppDetailsSettings error:', e);
+                        });
+                    });
+                    return;
+                }
+                // cordova-open-native-settings
+                if (window.cordova && cordova.plugins && cordova.plugins.settings) {
+                    cordova.plugins.settings.open('application_details', function () {}, function () {});
+                    return;
+                }
+                // cordova-plugin-app-preferences (community fork variants)
+                if (window.AppPreferences && typeof window.AppPreferences.open === 'function') {
+                    window.AppPreferences.open();
+                    return;
+                }
+                // @capacitor/app (some versions expose this)
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App &&
+                    typeof window.Capacitor.Plugins.App.openSettings === 'function') {
+                    window.Capacitor.Plugins.App.openSettings();
+                    return;
+                }
+            } catch (e) {
+                console.error('openAppSettings error:', e);
+            }
+
+            // No plugin available — guide the person manually instead.
+            alert('ناتوانرێت ڕاستەوخۆ ڕێکخستنەکان بکرێتەوە لەسەر ئەم ئامێرە.\n\nتکایە بە دەستی بڕۆ بۆ: ڕێکخستنەکان (Settings) ← ئەپەکان (Apps) ← ئەپی پەیمانگا (CIS)، وەک لە هەنگاوەکانی سەرەوە باسکرا.');
+        }
+
+        /* ==================================================================
+           4) Battery optimization exemption (Android, via CIS plugin)
+           ================================================================== */
+        async function requestBatteryExemption() {
+            if (!hasCISPlugin()) {
+                alert('ئەم تایبەتمەندییە تەنها لەناو ئەپی ئەندرۆید کاردەکات.');
+                return;
+            }
+            try {
+                await cordova.plugins.cisAppSettings.requestIgnoreBatteryOptimizations();
+            } catch (e) {
+                console.error('requestIgnoreBatteryOptimizations error:', e);
+            }
+            // Give the user a moment to respond to the system dialog,
+            // then refresh the button state.
+            setTimeout(refreshStatus, 1500);
+        }
+
+        /* ==================================================================
+           5) First-launch forced onboarding
+           ------------------------------------------------------------------
+           index.html redirects here with ?first=1 the very first time the
+           app is opened (see FIRST_RUN_KEY logic in index.html). We show an
+           explicit "continue" card so the user isn't stuck here, and mark
+           the same flag as done in case they arrived by tapping the app's
+           notification-setup menu item directly (no redirect involved).
+           ================================================================== */
+        const FIRST_RUN_KEY = 'cisNotificationSetupSeen';
+
+        function finishFirstRun() {
+            try { localStorage.setItem(FIRST_RUN_KEY, '1'); } catch (e) { /* ignore */ }
+            window.location.href = 'index.html';
+        }
+
+        (function initFirstRun() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('first') === '1') {
+                document.getElementById('firstRunContinue').style.display = 'block';
+                // Repurpose the top-right back button so it also clears the
+                // first-run flag instead of silently looping the user back.
+                const backBtn = document.querySelector('.back-btn');
+                if (backBtn) {
+                    backBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        finishFirstRun();
+                    });
+                }
+            } else {
+                try { localStorage.setItem(FIRST_RUN_KEY, '1'); } catch (e) { /* ignore */ }
+            }
+        })();
+
+        refreshStatus();
+    </script>
+</body>
+</html>

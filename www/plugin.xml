@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-cis-appsettings"
+        version="1.0.0">
+
+    <name>CISAppSettings</name>
+    <description>
+        Small bridge plugin used by CIS Sulaimany app to jump the user
+        directly to the app's Notification Settings screen and to the
+        "Ignore Battery Optimizations" system prompt on Android, so
+        notifications from OneSignal are not silently killed by OEM
+        battery managers (Samsung / Xiaomi / Huawei etc.).
+    </description>
+    <license>MIT</license>
+
+    <js-module src="www/cisAppSettings.js" name="CISAppSettings">
+        <clobbers target="cordova.plugins.cisAppSettings" />
+    </js-module>
+
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="CISAppSettings">
+                <param name="android-package" value="com.cissulaimany.appsettings.CISAppSettingsPlugin" />
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+        </config-file>
+
+        <source-file src="src/android/CISAppSettingsPlugin.java"
+                     target-dir="src/com/cissulaimany/appsettings" />
+    </platform>
+</plugin>

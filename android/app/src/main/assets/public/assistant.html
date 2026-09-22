@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>داشبۆردی یاریدەدەر - CIS Sulaimany</title>
+
+    <link rel="icon" type="image/jpeg" href="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107">
+    <meta name="theme-color" content="#27A7E7">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #27A7E7;
+            --primary-dark: #1f8dc4;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        /* ===== Login ===== */
+        #loginPage {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        .login-box {
+            background: white;
+            border-radius: 18px;
+            padding: 36px 28px;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        .institute-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 3px solid var(--primary);
+            padding: 5px;
+            margin-bottom: 12px;
+        }
+        .login-box h1 { font-size: 18px; color: var(--primary); margin-bottom: 6px; }
+        .login-box p { font-size: 13px; color: var(--text-gray); margin-bottom: 22px; }
+        .form-group { text-align: right; margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .error-msg {
+            display: none;
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 18px;
+            font-size: 13px;
+            color: var(--text-gray);
+            text-decoration: none;
+        }
+
+        /* ===== Dashboard ===== */
+        #dashboardPage { display: none; }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 22px 16px;
+            text-align: center;
+            position: relative;
+        }
+        .header .institute-logo { border-color: white; background: white; }
+        .header h1 { color: white; font-size: 17px; margin-bottom: 2px; }
+        .header p { color: rgba(255,255,255,0.9); font-size: 12px; }
+        .logout-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .content { max-width: 600px; margin: 0 auto; padding: 24px 16px 40px; }
+
+        /* ===== Student absence summary modal ===== */
+        .sas-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center;
+            z-index: 5000; padding: 16px;
+        }
+        .sas-modal-content {
+            background: #fff; padding: 22px 18px; border-radius: 16px; width: 100%;
+            max-width: 640px; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.25);
+        }
+        .sas-close-btn {
+            background: #dc3545; color: #fff; padding: 6px 14px; border: none;
+            border-radius: 8px; cursor: pointer; float: left; font-size: 16px; font-weight: bold;
+        }
+        .sas-title { clear: both; margin-bottom: 16px; font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .sas-filters {
+            display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px;
+        }
+        .sas-filters input, .sas-filters select {
+            padding: 10px 12px; border-radius: 8px; border: 2px solid var(--border);
+            font-size: 14px; width: 100%;
+        }
+        .sas-filters input:focus, .sas-filters select:focus { outline: none; border-color: var(--primary); }
+        .sas-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+        .sas-btn-row button {
+            flex: 1; min-width: 100px; padding: 11px 10px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 600; cursor: pointer; color: #fff;
+        }
+        .sas-search-btn { background: #dc3545; }
+        .sas-export-btn { background: #059669; }
+        .sas-print-btn { background: #2563eb; }
+        .sas-date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+        .sas-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+        .sas-stat-card { text-align: center; padding: 14px 6px; border-radius: 10px; border: 2px solid; }
+        .sas-stat-total { background: rgba(23,162,184,0.1); border-color: #17a2b8; }
+        .sas-stat-absent { background: rgba(220,53,69,0.1); border-color: #dc3545; }
+        .sas-stat-avg { background: rgba(40,167,69,0.1); border-color: #28a745; }
+        .sas-stat-number { font-size: 22px; font-weight: 800; }
+        .sas-stat-total .sas-stat-number { color: #17a2b8; }
+        .sas-stat-absent .sas-stat-number { color: #dc3545; }
+        .sas-stat-avg .sas-stat-number { color: #28a745; }
+        .sas-stat-label { font-size: 11px; color: var(--text-gray); margin-top: 4px; }
+        .sas-results { margin-top: 8px; }
+        .student-absence-card {
+            background: var(--light-bg); border-radius: 10px; padding: 16px;
+            margin-bottom: 12px; border-right: 4px solid #dc3545;
+        }
+        .student-absence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+        .student-absence-name { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+        .student-absence-count { background: #dc3545; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+        .student-absence-details { color: var(--text-gray); font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .absence-period { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+        .period-title { font-weight: 700; color: var(--text-dark); margin-bottom: 6px; font-size: 13px; }
+        .period-absences { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px; }
+        .absence-date { background: rgba(220,53,69,0.1); color: #dc3545; padding: 4px 8px; border-radius: 6px; font-size: 11px; text-align: center; font-weight: 600; }
+
+        .action-card {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        .accordion-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 18px 20px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            color: var(--text-dark);
+            cursor: pointer;
+            text-align: right;
+        }
+        .accordion-header span { display: flex; align-items: center; gap: 8px; }
+        .accordion-header .chevron {
+            color: var(--text-gray);
+            font-size: 13px;
+            transition: transform 0.2s;
+        }
+        .accordion-header.open .chevron { transform: rotate(180deg); }
+        .accordion-body {
+            display: none;
+            padding: 0 20px 20px;
+        }
+        .accordion-body.open { display: block; }
+        .action-card p { font-size: 13px; color: var(--text-gray); margin-bottom: 16px; }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+
+        .autocomplete-wrapper { position: relative; }
+        .autocomplete-list {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0; left: 0;
+            max-height: 220px;
+            overflow-y: auto;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            z-index: 100;
+        }
+        .autocomplete-list.active { display: block; }
+        .autocomplete-item { padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+        .autocomplete-item:hover { background: var(--light-bg); }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 14px;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .submit-btn:hover { background: var(--primary-dark); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .success-notice {
+            display: none;
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #d1fae5;
+            color: #047857;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .success-notice.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== Login Page ===== -->
+    <div id="loginPage">
+        <div class="login-box">
+            <img src="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107" class="institute-logo" alt="لۆگۆ">
+            <h1>داشبۆردی یاریدەدەر</h1>
+            <p>تکایە ناوی بەکارهێنەر و وشەی نهێنیت بنووسە</p>
+
+            <div class="error-msg" id="errorMsg">
+                <i class="fas fa-exclamation-circle"></i> ناوی بەکارهێنەر یان وشەی نهێنی هەڵەیە
+            </div>
+
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> ناوی بەکارهێنەر</label>
+                    <input type="text" id="username" placeholder="ناوی بەکارهێنەر" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> وشەی نهێنی</label>
+                    <input type="password" id="password" placeholder="وشەی نهێنی" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> چوونەژوورەوە
+                </button>
+            </form>
+
+            <button type="button" class="login-btn" style="background:white; color:var(--primary); border:2px solid var(--primary); margin-top:12px;" onclick="openQRScanner()">
+                <i class="fas fa-qrcode"></i> سکانی بارکۆد بۆ چوونەژوورەوە
+            </button>
+
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i> گەڕانەوە بۆ سەرەکی</a>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qrScannerModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:9000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:white; border-radius:16px; padding:20px; max-width:340px; width:100%; text-align:center; position:relative;">
+            <button onclick="closeQRScanner()" style="position:absolute; top:10px; left:10px; width:32px; height:32px; border-radius:50%; border:none; background:var(--light-bg); color:var(--text-gray); font-size:16px; cursor:pointer;"><i class="fas fa-times"></i></button>
+            <p style="margin-bottom:10px; font-weight:600;">بارکۆدەکە بخەرە ناو چوارچێوەکە</p>
+            <video id="qrVideo" playsinline style="width:100%; border-radius:12px; background:#000;"></video>
+            <canvas id="qrCanvas" style="display:none;"></canvas>
+            <p id="qrScanStatus" style="margin-top:10px; font-size:13px; color:var(--text-gray);">چاوەڕێی کامێرا...</p>
+        </div>
+    </div>
+
+    <!-- Student Absence Summary Modal -->
+    <div id="studentAbsenceModal" class="sas-modal">
+        <div class="sas-modal-content">
+            <button class="sas-close-btn" onclick="closeStudentAbsenceModal()">&times;</button>
+            <div class="sas-title"><i class="fas fa-chart-bar" style="color:#059669;"></i> کۆی غیاباتی خوێندکار</div>
+
+            <div class="sas-filters">
+                <input type="text" id="studentAbsenceName" placeholder="ناوی خوێندکار...">
+                <select id="studentAbsenceLevel">
+                    <option value="">هەموو ئاستەکان</option>
+                    <option value="1">ئاستی 1</option>
+                    <option value="2">ئاستی 2</option>
+                    <option value="3">ئاستی 3</option>
+                    <option value="4">ئاستی 4</option>
+                    <option value="5">ئاستی 5</option>
+                </select>
+                <select id="studentAbsenceGroup">
+                    <option value="">هەموو گرووپەکان</option>
+                    <option value="A">گرووپی A</option>
+                    <option value="B">گرووپی B</option>
+                    <option value="C">گرووپی C</option>
+                    <option value="D">گرووپی D</option>
+                    <option value="E">گرووپی E</option>
+                    <option value="WEB">گرووپی WEB</option>
+                    <option value="NET">گرووپی NET</option>
+                    <option value="PRO">گرووپی PRO</option>
+                </select>
+            </div>
+
+            <div class="sas-btn-row">
+                <button class="sas-search-btn" onclick="searchStudentAbsence()"><i class="fas fa-search"></i> گەڕان</button>
+            </div>
+
+            <div class="sas-date-row">
+                <input type="date" id="studentAbsenceStartDate">
+                <input type="date" id="studentAbsenceEndDate">
+            </div>
+
+            <div class="sas-btn-row">
+                <button class="sas-export-btn" onclick="exportStudentAbsence()"><i class="fas fa-file-export"></i> هەناردە</button>
+                <button class="sas-print-btn" onclick="printStudentAbsence()"><i class="fas fa-print"></i> چاپ</button>
+            </div>
+
+            <div class="sas-stats" id="studentAbsenceStats" style="display:none;">
+                <div class="sas-stat-card sas-stat-total">
+                    <div class="sas-stat-number" id="totalStudentsFound">0</div>
+                    <div class="sas-stat-label">کۆی خوێندکارەکان</div>
+                </div>
+                <div class="sas-stat-card sas-stat-absent">
+                    <div class="sas-stat-number" id="totalAbsencesFound">0</div>
+                    <div class="sas-stat-label">کۆی غیابات</div>
+                </div>
+                <div class="sas-stat-card sas-stat-avg">
+                    <div class="sas-stat-number" id="averageAbsences">0</div>
+                    <div class="sas-stat-label">تێکڕای غیابات</div>
+                </div>
+            </div>
+
+            <div class="sas-results" id="studentAbsenceResults">
+                <p style="text-align:center; padding:30px; color:var(--text-gray);">🔍 گەڕانەکەت دەستپێبکە بۆ بینینی کۆی غیاباتەکانی خوێندکار</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Dashboard ===== -->
+    <div id="dashboardPage">
+        <div class="header">
+            <button class="logout-btn" onclick="logout()" title="چوونەدەرەوە"><i class="fas fa-sign-out-alt"></i></button>
+            <button class="logout-btn" style="left:auto; right:16px;" onclick="openMessageHistory()" title="پەیامەکانم">
+                <i class="fas fa-bell"></i>
+                <span id="assistantBellBadge" style="display:none; position:absolute; top:-4px; left:-4px; background:#db2777; color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; font-weight:800;">0</span>
+            </button>
+            <img src="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107" class="institute-logo" alt="لۆگۆ">
+            <h1 id="welcomeText">بەخێربێیت</h1>
+            <p>یاریدەدەری بەڕێوەبەر</p>
+        </div>
+
+        <div class="content">
+            <!-- Incoming messages from admin -->
+            <div class="action-card">
+                <button type="button" class="accordion-header" onclick="toggleAccordion('accInbox')">
+                    <span><i class="fas fa-inbox" style="color:#db2777;"></i> پەیامی وەرگیراو لە بەڕێوەبەر</span>
+                    <i class="fas fa-chevron-down chevron" id="accInbox-chevron"></i>
+                    <span id="assistantInboxBadge" style="display:none; background:#db2777; color:#fff; border-radius:10px; padding:1px 7px; font-size:11px; font-weight:800; margin-right:6px;">0</span>
+                </button>
+                <div class="accordion-body" id="accInbox">
+                    <p>ئەم پەیامانە لەلایەن بەڕێوەبەرەوە بۆت نێردراون، دەتوانیت وەڵامیشیان بدەیتەوە.</p>
+                    <div id="assistantInboxList" style="display:grid; gap:10px;">
+                        <p style="text-align:center; color:var(--text-gray); padding:16px;">بارکردن...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message History (sent items + replies) -->
+            <div class="action-card">
+                <button type="button" class="accordion-header" onclick="toggleAccordion('accHistory')">
+                    <span><i class="fas fa-history" style="color:#0ea5e9;"></i> پەیامەکانم و وەڵامەکان</span>
+                    <i class="fas fa-chevron-down chevron" id="accHistory-chevron"></i>
+                </button>
+                <div class="accordion-body" id="accHistory">
+                    <p>هەموو پەیامەکانی ناردووت (بۆ مامۆستا و بۆ بەخێوکار) لێرە دەردەکەون، لەگەڵ وەڵامەکانیان ئەگەر هەبن.</p>
+                    <div id="messageHistoryList" style="display:grid; gap:10px;">
+                        <p style="text-align:center; color:var(--text-gray); padding:16px;">بارکردن...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Send message to teacher(s) -->
+            <div class="action-card">
+                <button type="button" class="accordion-header" onclick="toggleAccordion('acc1')">
+                    <span><i class="fas fa-chalkboard-teacher" style="color:var(--primary);"></i> ناردنی پەیام بۆ مامۆستا</span>
+                    <i class="fas fa-chevron-down chevron" id="acc1-chevron"></i>
+                </button>
+                <div class="accordion-body" id="acc1">
+                    <p>پەیامەکە ڕاستەوخۆ لە بەشی "پەیامەکان"ی داشبۆردی مامۆستادا دەردەکەوێت.</p>
+
+                    <form onsubmit="sendTeacherMessage(event)">
+                        <div class="form-group">
+                            <label>ناردن بۆ</label>
+                            <select id="teacherMsgType" onchange="toggleTeacherMsgType()">
+                                <option value="single">مامۆستایەکی دیاریکراو</option>
+                                <option value="all">هەموو مامۆستایان بەیەکجار</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="teacherSingleGroup">
+                            <label>ناوی مامۆستا</label>
+                            <div class="autocomplete-wrapper">
+                                <input type="text" id="teacherMsgName" placeholder="دەست پێبکە بە نووسین..." autocomplete="off">
+                                <div class="autocomplete-list" id="teacherMsgNameList"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>پەیامەکەت</label>
+                            <textarea id="teacherMsgText" rows="4" placeholder="پەیامەکەت بنووسە..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="teacherMsgSendBtn">
+                            <i class="fas fa-paper-plane"></i> ناردن بۆ مامۆستا
+                        </button>
+                        <div class="success-notice" id="teacherMsgSuccess">
+                            <i class="fas fa-check-circle"></i> پەیامەکە نێردرا!
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Send announcement to all guardians -->
+            <div class="action-card">
+                <button type="button" class="accordion-header" onclick="toggleAccordion('acc2')">
+                    <span><i class="fas fa-bell" style="color:#f97316;"></i> ناردنی ئاگاداری بۆ بەخێوکاران</span>
+                    <i class="fas fa-chevron-down chevron" id="acc2-chevron"></i>
+                </button>
+                <div class="accordion-body" id="acc2">
+                    <p>ئەم ئاگاداریە بۆ هەموو بەخێوکاران لە داشبۆردی خۆیاندا دەردەکەوێت.</p>
+
+                    <form onsubmit="sendGuardianAnnouncement(event)">
+                        <div class="form-group">
+                            <label>سەردێڕ</label>
+                            <input type="text" id="announceTitle" placeholder="نموونە: پشوودان بۆ سبەینێ" required
+                                   style="width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:10px; font-size:14px;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>پەیام</label>
+                            <textarea id="announceMessage" rows="4" placeholder="ناوەڕۆکی ئاگاداریەکە بنووسە..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>ڕادەی گرنگی</label>
+                            <select id="announcePriority">
+                                <option value="ئاسایی">ئاسایی</option>
+                                <option value="گرنگ">گرنگ</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="announceSendBtn" style="background:#f97316;">
+                            <i class="fas fa-paper-plane"></i> ناردنی ئاگاداری
+                        </button>
+                        <div class="success-notice" id="announceSuccess">
+                            <i class="fas fa-check-circle"></i> ئاگاداریەکە نێردرا بۆ هەموو بەخێوکاران!
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Send message to a specific student's guardian -->
+            <div class="action-card">
+                <button type="button" class="accordion-header" onclick="toggleAccordion('acc3')">
+                    <span><i class="fas fa-user-graduate" style="color:#8b5cf6;"></i> ناردنی پەیام بۆ خوێندکار/بەخێوکار</span>
+                    <i class="fas fa-chevron-down chevron" id="acc3-chevron"></i>
+                </button>
+                <div class="accordion-body" id="acc3">
+                    <p>خوێندکارێک هەڵبژێرە — پەیامەکە بۆ بەخێوکاری تۆمارکراوی ئەو خوێندکارە دەردەکەوێت (لە داشبۆردی بەخێوکاردا)، و دەتوانن وەڵامیشی بدەنەوە.</p>
+
+                    <form onsubmit="sendGuardianMessage(event)">
+                        <div class="form-group">
+                            <label>ناوی خوێندکار</label>
+                            <div class="autocomplete-wrapper">
+                                <input type="text" id="studentMsgName" placeholder="دەست پێبکە بە نووسین..." autocomplete="off" required>
+                                <div class="autocomplete-list" id="studentMsgNameList"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>پەیامەکەت</label>
+                            <textarea id="studentMsgText" rows="4" placeholder="پەیامەکەت بنووسە..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="studentMsgSendBtn" style="background:#8b5cf6;">
+                            <i class="fas fa-paper-plane"></i> ناردن
+                        </button>
+                        <div class="success-notice" id="studentMsgSuccess">
+                            <i class="fas fa-check-circle"></i> پەیامەکە نێردرا!
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Daily attendance report -->
+            <div class="action-card">
+                <button type="button" class="accordion-header" onclick="toggleAccordion('acc4')">
+                    <span><i class="fas fa-clipboard-list" style="color:#059669;"></i> ڕاپۆرتی غیابات</span>
+                    <i class="fas fa-chevron-down chevron" id="acc4-chevron"></i>
+                </button>
+                <div class="accordion-body" id="acc4">
+                    <p>غیاباتی تۆمارکراو لەلایەن مامۆستایانەوە، ڕۆژانە.</p>
+
+                    <button type="button" onclick="openStudentAbsenceModal()"
+                            style="width:100%; padding:12px 10px; border:none; border-radius:10px; background:#059669; color:#fff; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:14px;">
+                        <i class="fas fa-chart-bar"></i> کۆی غیاباتی خوێندکار
+                    </button>
+
+                    <div class="form-group">
+                        <label>بەروار</label>
+                        <input type="date" id="attendanceReportDate" onchange="renderAttendanceReport()"
+                               style="width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:10px; font-size:14px;">
+                    </div>
+
+                    <div style="overflow-x:auto; margin-top:12px;">
+                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                            <thead>
+                                <tr style="background:var(--light-bg); text-align:right;">
+                                    <th style="padding:8px;">خوێندکار</th>
+                                    <th style="padding:8px;">پۆل</th>
+                                    <th style="padding:8px;">وانە</th>
+                                    <th style="padding:8px;">مامۆستا</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceReportBody">
+                                <tr><td colspan="4" style="text-align:center; padding:16px; color:var(--text-gray);">بارکردن...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLlHLpZ0S3_Ll93-h93Nyhx2kuXChH1Js",
+            authDomain: "school-cis-e188b.firebaseapp.com",
+            databaseURL: "https://school-cis-e188b-default-rtdb.firebaseio.com",
+            projectId: "school-cis-e188b",
+            storageBucket: "school-cis-e188b.firebasestorage.app",
+            messagingSenderId: "206651660812",
+            appId: "1:206651660812:web:5d9b06f66e1352e3b5ec29"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let currentAssistant = null;
+        let teacherOptionsList = [];
+
+        // ===== Auto login =====
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('assistantLogin');
+            if (saved) {
+                const { username, password } = JSON.parse(saved);
+                attemptLogin(username, password, true);
+            }
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            attemptLogin(username, password, false);
+        }
+
+        function attemptLogin(username, password, isAuto) {
+            database.ref('assistants/' + username).once('value', (snapshot) => {
+                const assistant = snapshot.val();
+                if (assistant && assistant.password === password) {
+                    currentAssistant = { username, ...assistant };
+                    localStorage.setItem('assistantLogin', JSON.stringify({ username, password }));
+                    oneSignalSetIdentity(username, 'assistant');
+                    showDashboard();
+                } else if (!isAuto) {
+                    document.getElementById('errorMsg').style.display = 'block';
+                } else {
+                    localStorage.removeItem('assistantLogin');
+                }
+            }, () => {
+                if (!isAuto) document.getElementById('errorMsg').style.display = 'block';
+            });
+        }
+
+        // ===== QR Code Scanner =====
+        let qrStream = null;
+        let qrScanInterval = null;
+
+        function openQRScanner() {
+            document.getElementById('qrScannerModal').style.display = 'flex';
+            document.getElementById('qrScanStatus').textContent = 'چاوەڕێی کامێرا...';
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    qrStream = stream;
+                    const video = document.getElementById('qrVideo');
+                    video.srcObject = stream;
+                    video.setAttribute('playsinline', true);
+                    video.play();
+                    document.getElementById('qrScanStatus').textContent = 'بارکۆدەکە بخەرە بەردەم کامێرا';
+                    qrScanInterval = setInterval(scanQRFrame, 300);
+                })
+                .catch(() => {
+                    document.getElementById('qrScanStatus').textContent = 'نەتوانرا دەستگەیشتن بە کامێرا بکرێت.';
+                });
+        }
+
+        function scanQRFrame() {
+            const video = document.getElementById('qrVideo');
+            const canvas = document.getElementById('qrCanvas');
+            if (!video.videoWidth) return;
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+                try {
+                    const parsed = JSON.parse(code.data);
+                    if (parsed.u && parsed.p) {
+                        closeQRScanner();
+                        document.getElementById('username').value = parsed.u;
+                        document.getElementById('password').value = parsed.p;
+                        attemptLogin(parsed.u, parsed.p, false);
+                        return;
+                    }
+                } catch (e) {
+                    document.getElementById('qrScanStatus').textContent = 'ئەم بارکۆدە بۆ چوونەژوورەوە نییە';
+                }
+            }
+        }
+
+        function closeQRScanner() {
+            document.getElementById('qrScannerModal').style.display = 'none';
+            if (qrScanInterval) { clearInterval(qrScanInterval); qrScanInterval = null; }
+            if (qrStream) {
+                qrStream.getTracks().forEach(track => track.stop());
+                qrStream = null;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('assistantLogin');
+            currentAssistant = null;
+            oneSignalClearIdentity();
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function toggleAccordion(id) {
+            const body = document.getElementById(id);
+            const header = body.previousElementSibling;
+            const isOpen = body.classList.contains('open');
+
+            // Close all other accordions
+            document.querySelectorAll('.accordion-body.open').forEach(b => {
+                if (b !== body) {
+                    b.classList.remove('open');
+                    b.previousElementSibling.classList.remove('open');
+                }
+            });
+
+            body.classList.toggle('open', !isOpen);
+            header.classList.toggle('open', !isOpen);
+        }
+
+        function showDashboard() {
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'block';
+            document.getElementById('welcomeText').textContent = 'بەخێربێیت ' + currentAssistant.name;
+            loadTeachersList();
+            loadStudentsList();
+            loadAttendanceReport();
+            loadMessageHistory();
+            loadAssistantInbox();
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('attendanceReportDate').value = today;
+        }
+
+        // ===== Message History (sent items + replies) =====
+        let messageHistoryRecords = [];
+
+        // ===== Incoming messages from admin =====
+        let assistantInboxRecords = [];
+
+        function loadAssistantInbox() {
+            if (!currentAssistant) return;
+            database.ref('staffMessages').on('value', (snapshot) => {
+                const data = snapshot.val();
+                assistantInboxRecords = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const m = { id: key, ...data[key] };
+                        if (m.staffName === currentAssistant.username) {
+                            assistantInboxRecords.push(m);
+                        }
+                    });
+                }
+                assistantInboxRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                const unreadCount = assistantInboxRecords.filter(m => !m.read).length;
+                const badge = document.getElementById('assistantInboxBadge');
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                renderAssistantInbox();
+            });
+        }
+
+        function renderAssistantInbox() {
+            const list = document.getElementById('assistantInboxList');
+            if (!list) return;
+            list.innerHTML = '';
+
+            if (assistantInboxRecords.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:var(--text-gray); padding:16px;">هیچ پەیامێکت نییە</p>';
+                return;
+            }
+
+            assistantInboxRecords.forEach(m => {
+                const div = document.createElement('div');
+                div.style.cssText = `background:var(--light-bg); border-radius:10px; padding:12px; border-right:4px solid ${m.read ? '#cbd5e1' : '#db2777'};`;
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+                        <span style="font-weight:700; font-size:13px;"><i class="fas fa-user-shield"></i> ${m.senderName}</span>
+                        ${m.read ? '' : '<span style="background:#fce7f3; color:#db2777; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:800;">نوێ</span>'}
+                    </div>
+                    <div style="font-size:13px; color:var(--text-dark); margin-bottom:6px;">${m.message}</div>
+                    ${m.reply ? `<div style="font-size:12px; color:#047857; background:#d1fae5; padding:8px; border-radius:8px; margin-bottom:6px;"><strong><i class="fas fa-reply"></i> وەڵامی تۆ:</strong> ${m.reply}</div>` : ''}
+                    ${(!m.reply) ? `
+                    <div id="assistantReplyBox-${m.id}" style="display:none; margin-bottom:8px;">
+                        <textarea id="assistantReplyText-${m.id}" rows="3" placeholder="وەڵامەکەت بنووسە..." style="width:100%; padding:8px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13px; resize:vertical;"></textarea>
+                        <button onclick="sendAssistantReply('${m.id}')" style="margin-top:6px; border:none; background:var(--primary); color:white; padding:7px 14px; border-radius:8px; font-size:12px; cursor:pointer;"><i class="fas fa-paper-plane"></i> ناردنی وەڵام</button>
+                    </div>` : ''}
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11px; color:var(--text-gray);">${new Date(m.date).toLocaleString('ku')}</span>
+                        <div style="display:flex; gap:6px;">
+                            ${(!m.reply) ? `<button onclick="toggleAssistantReplyBox('${m.id}')" style="border:none; background:var(--primary); color:white; padding:5px 10px; border-radius:8px; font-size:11px; cursor:pointer;"><i class="fas fa-reply"></i> وەڵام</button>` : ''}
+                            ${m.read ? '' : `<button onclick="markAssistantMessageRead('${m.id}')" style="border:none; background:#10b981; color:white; padding:5px 10px; border-radius:8px; font-size:11px; cursor:pointer;"><i class="fas fa-check"></i> خوێندمەوە</button>`}
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function toggleAssistantReplyBox(id) {
+            const box = document.getElementById('assistantReplyBox-' + id);
+            if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function sendAssistantReply(id) {
+            const textEl = document.getElementById('assistantReplyText-' + id);
+            const replyText = textEl.value.trim();
+            if (!replyText) {
+                alert('تکایە وەڵامەکەت بنووسە');
+                return;
+            }
+            database.ref('staffMessages/' + id).update({
+                reply: replyText,
+                replyDate: new Date().toISOString(),
+                read: true
+            }).catch(() => {
+                alert('نەتوانرا وەڵامەکە بنێردرێت');
+            });
+        }
+
+        function markAssistantMessageRead(id) {
+            database.ref('staffMessages/' + id).update({ read: true });
+        }
+
+        function loadMessageHistory() {
+            if (!currentAssistant) return;
+
+            let staffMsgs = [];
+            let guardianMsgs = [];
+
+            function mergeAndRender() {
+                messageHistoryRecords = [...staffMsgs, ...guardianMsgs];
+                messageHistoryRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                const unseenCount = messageHistoryRecords.filter(m => m.reply && !m.assistantSeenReply).length;
+                const badge = document.getElementById('assistantBellBadge');
+                if (unseenCount > 0) {
+                    badge.textContent = unseenCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                renderMessageHistory();
+            }
+
+            database.ref('staffMessages').on('value', (snapshot) => {
+                const data = snapshot.val();
+                staffMsgs = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const m = { id: key, node: 'staffMessages', recipientLabel: 'مامۆستا', ...data[key] };
+                        if (m.sentByAssistant === currentAssistant.username) {
+                            m.recipientName = m.staffDisplayName || m.staffName;
+                            staffMsgs.push(m);
+                        }
+                    });
+                }
+                mergeAndRender();
+            });
+
+            database.ref('guardianMessages').on('value', (snapshot) => {
+                const data = snapshot.val();
+                guardianMsgs = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const m = { id: key, node: 'guardianMessages', recipientLabel: 'بەخێوکاری', ...data[key] };
+                        if (m.sentByAssistant === currentAssistant.username) {
+                            m.recipientName = m.studentName;
+                            guardianMsgs.push(m);
+                        }
+                    });
+                }
+                mergeAndRender();
+            });
+        }
+
+        function openMessageHistory() {
+            const body = document.getElementById('accHistory');
+            const header = body.previousElementSibling;
+            if (!body.classList.contains('open')) {
+                toggleAccordion('accHistory');
+            }
+            body.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Mark all visible replies as seen
+            messageHistoryRecords.forEach(m => {
+                if (m.reply && !m.assistantSeenReply) {
+                    database.ref(m.node + '/' + m.id).update({ assistantSeenReply: true });
+                }
+            });
+        }
+
+        function renderMessageHistory() {
+            const list = document.getElementById('messageHistoryList');
+            if (!list) return;
+            list.innerHTML = '';
+
+            if (messageHistoryRecords.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:var(--text-gray); padding:16px;">هیچ پەیامێکت نەناردووە</p>';
+                return;
+            }
+
+            messageHistoryRecords.forEach(m => {
+                const hasUnseenReply = m.reply && !m.assistantSeenReply;
+                const div = document.createElement('div');
+                div.style.cssText = `background:var(--light-bg); border-radius:10px; padding:12px; border-right:4px solid ${hasUnseenReply ? '#db2777' : (m.reply ? '#10b981' : '#cbd5e1')};`;
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+                        <span style="font-weight:700; font-size:13px;">بۆ ${m.recipientLabel}: ${m.recipientName}</span>
+                        ${hasUnseenReply ? '<span style="background:#fce7f3; color:#db2777; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:800;">وەڵامی نوێ</span>' : ''}
+                    </div>
+                    <div style="font-size:13px; color:var(--text-dark); margin-bottom:6px;">${m.message}</div>
+                    ${m.reply ? `<div style="font-size:12px; color:#047857; background:#d1fae5; padding:8px; border-radius:8px; margin-bottom:6px;"><strong><i class="fas fa-reply"></i> وەڵام:</strong> ${m.reply}</div>` : `<div style="font-size:11px; color:var(--text-gray); font-style:italic;">هێشتا وەڵام نەدراوەتەوە</div>`}
+                    <div style="font-size:11px; color:var(--text-gray);">${new Date(m.date).toLocaleString('ku')}</div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // ===== Load teacher list for autocomplete =====
+        let teacherNameToUsername = {};
+        function loadTeachersList() {
+            database.ref('teachers').once('value', (snapshot) => {
+                const data = snapshot.val();
+                teacherOptionsList = [];
+                teacherNameToUsername = {};
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const t = data[key];
+                        if (t && t.name) {
+                            teacherOptionsList.push(t.name);
+                            teacherNameToUsername[t.name] = key;
+                        }
+                    });
+                }
+                teacherOptionsList.sort((a, b) => a.localeCompare(b, 'ku'));
+            });
+        }
+
+        // ===== Load student list for autocomplete =====
+        let studentOptionsList = [];
+        let allStudents = [];
+
+        function loadStudentsList() {
+            database.ref('students').once('value', (snapshot) => {
+                const data = snapshot.val();
+                allStudents = [];
+                if (data) {
+                    Object.values(data).forEach(s => {
+                        if (s && s.name) allStudents.push(s);
+                    });
+                }
+                allStudents.sort((a, b) => {
+                    const levelA = parseInt(a.level) || 0;
+                    const levelB = parseInt(b.level) || 0;
+                    if (levelA !== levelB) return levelA - levelB;
+                    const groupA = (a.group || '').toString();
+                    const groupB = (b.group || '').toString();
+                    if (groupA !== groupB) return groupA.localeCompare(groupB);
+                    return (a.name || '').localeCompare(b.name || '', 'ku');
+                });
+                studentOptionsList = allStudents.map(s => `${s.name} - ئاستی ${s.level || ''} - گرووپی ${s.group || ''}`);
+            });
+        }
+
+        function setupAutocomplete(inputId, listId, getOptions) {
+            const input = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+            if (!input || !list) return;
+
+            function render(filterText) {
+                const options = getOptions();
+                const term = (filterText || '').trim().toLowerCase();
+                const matches = term ? options.filter(o => o.toLowerCase().includes(term)) : options;
+                list.innerHTML = '';
+                matches.forEach(opt => {
+                    const div = document.createElement('div');
+                    div.className = 'autocomplete-item';
+                    div.textContent = opt;
+                    div.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        input.value = opt;
+                        list.classList.remove('active');
+                    });
+                    list.appendChild(div);
+                });
+                list.classList.add('active');
+            }
+
+            input.addEventListener('focus', () => render(input.value));
+            input.addEventListener('input', () => render(input.value));
+            input.addEventListener('blur', () => setTimeout(() => list.classList.remove('active'), 150));
+        }
+
+        setupAutocomplete('teacherMsgName', 'teacherMsgNameList', () => teacherOptionsList);
+        setupAutocomplete('studentMsgName', 'studentMsgNameList', () => studentOptionsList);
+
+        // ===== Send message to a student's guardian =====
+        async function sendGuardianMessage(event) {
+            event.preventDefault();
+            const studentName = document.getElementById('studentMsgName').value.trim();
+            const messageText = document.getElementById('studentMsgText').value;
+            const btn = document.getElementById('studentMsgSendBtn');
+            const originalHtml = btn.innerHTML;
+            const successNotice = document.getElementById('studentMsgSuccess');
+            successNotice.classList.remove('active');
+
+            btn.disabled = true;
+            try {
+                await database.ref('guardianMessages').push({
+                    studentName: studentName,
+                    senderName: 'یاریدەدەری بەڕێوەبەر (' + currentAssistant.name + ')',
+                    message: messageText,
+                    date: new Date().toISOString(),
+                    read: false,
+                    sentByAssistant: currentAssistant.username,
+                    assistantSeenReply: true
+                });
+                sendPushNotification({ role: 'guardian' }, 'پەیامی نوێ لە یاریدەدەر', messageText);
+                document.getElementById('studentMsgText').value = '';
+                document.getElementById('studentMsgName').value = '';
+                successNotice.classList.add('active');
+            } catch (err) {
+                alert('نەتوانرا پەیامەکە بنێردرێت');
+            }
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+
+        // ===== Daily attendance report =====
+        let flatAttendanceRecords = [];
+
+        function studentNameByCode(code) {
+            const s = allStudents.find(st => String(st.code) === String(code));
+            return s ? s.name : code;
+        }
+
+        function loadAttendanceReport() {
+            database.ref('attendance').on('value', (snapshot) => {
+                const data = snapshot.val();
+                flatAttendanceRecords = [];
+                if (data) {
+                    Object.keys(data).forEach(date => {
+                        const dateData = data[date] || {};
+                        Object.keys(dateData).forEach(levelGroup => {
+                            const courses = dateData[levelGroup] || {};
+                            Object.keys(courses).forEach(course => {
+                                const times = courses[course] || {};
+                                Object.keys(times).forEach(time => {
+                                    const teachers = times[time] || {};
+                                    Object.keys(teachers).forEach(teacher => {
+                                        const students = teachers[teacher] || {};
+                                        Object.keys(students).forEach(studentCode => {
+                                            if (students[studentCode] === 'absent') {
+                                                flatAttendanceRecords.push({
+                                                    date, levelGroup, course, time,
+                                                    teacher: teacher.replace(/_/g, ' '),
+                                                    studentCode,
+                                                    studentName: studentNameByCode(studentCode)
+                                                });
+                                            }
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                }
+                renderAttendanceReport();
+            });
+        }
+
+        function renderAttendanceReport() {
+            const tbody = document.getElementById('attendanceReportBody');
+            if (!tbody) return;
+            const filterDate = document.getElementById('attendanceReportDate').value;
+            const records = filterDate ? flatAttendanceRecords.filter(r => r.date === filterDate) : flatAttendanceRecords;
+
+            tbody.innerHTML = '';
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:16px; color:var(--text-gray);">هیچ تۆمارێکی غیاب نییە</td></tr>';
+                return;
+            }
+            records.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid var(--border)';
+                tr.innerHTML = `
+                    <td style="padding:8px;">${r.studentName}</td>
+                    <td style="padding:8px;">${r.levelGroup}</td>
+                    <td style="padding:8px;">${r.course}</td>
+                    <td style="padding:8px;">${r.teacher}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ===== Student absence summary (modal) =====
+        let studentAbsenceData = [];
+
+        function parseLevelGroup(levelGroup) {
+            let level, group;
+            if (levelGroup.includes('WEB')) {
+                level = levelGroup.replace('WEB', '');
+                group = 'WEB';
+            } else if (levelGroup.includes('NET')) {
+                level = levelGroup.replace('NET', '');
+                group = 'NET';
+            } else if (levelGroup.includes('PRO')) {
+                level = levelGroup.replace('PRO', '');
+                group = 'PRO';
+            } else {
+                level = levelGroup.substring(0, levelGroup.length - 1);
+                group = levelGroup.substring(levelGroup.length - 1);
+            }
+            return { level, group };
+        }
+
+        function openStudentAbsenceModal() {
+            document.getElementById('studentAbsenceModal').style.display = 'flex';
+
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            document.getElementById('studentAbsenceStartDate').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('studentAbsenceEndDate').value = today.toISOString().split('T')[0];
+
+            document.getElementById('studentAbsenceName').value = '';
+            document.getElementById('studentAbsenceLevel').value = '';
+            document.getElementById('studentAbsenceGroup').value = '';
+            document.getElementById('studentAbsenceResults').innerHTML =
+                '<p style="text-align:center; padding:30px; color:var(--text-gray);">🔍 گەڕانەکەت دەستپێبکە بۆ بینینی کۆی غیاباتەکانی خوێندکار</p>';
+            document.getElementById('studentAbsenceStats').style.display = 'none';
+            studentAbsenceData = [];
+        }
+
+        function closeStudentAbsenceModal() {
+            document.getElementById('studentAbsenceModal').style.display = 'none';
+        }
+
+        function searchStudentAbsence() {
+            const nameQuery = document.getElementById('studentAbsenceName').value.toLowerCase().trim();
+            const levelQuery = document.getElementById('studentAbsenceLevel').value;
+            const groupQuery = document.getElementById('studentAbsenceGroup').value;
+            const startDate = document.getElementById('studentAbsenceStartDate').value;
+            const endDate = document.getElementById('studentAbsenceEndDate').value;
+
+            if (!startDate || !endDate) {
+                alert('تکایە هەردوو بەرواری دەستپێک و کۆتایی هەڵبژێرە!');
+                return;
+            }
+
+            const resultsContainer = document.getElementById('studentAbsenceResults');
+            resultsContainer.innerHTML = '<p style="text-align:center; padding:30px;">کەمێک چاوەڕێ بکە، داتاکان بار دەکرێن...</p>';
+
+            const filteredStudents = allStudents.filter(student => {
+                const nameMatch = !nameQuery || (student.name || '').toLowerCase().includes(nameQuery);
+                const levelMatch = !levelQuery || String(student.level) === String(levelQuery);
+                const groupMatch = !groupQuery || String(student.group).toUpperCase() === String(groupQuery).toUpperCase();
+                return nameMatch && levelMatch && groupMatch;
+            });
+
+            if (filteredStudents.length === 0) {
+                resultsContainer.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-gray);">هیچ خوێندکارێک نەدۆزرایەوە</p>';
+                document.getElementById('studentAbsenceStats').style.display = 'none';
+                return;
+            }
+
+            calculateStudentAbsences(filteredStudents, startDate, endDate);
+        }
+
+        function calculateStudentAbsences(students, startDate, endDate) {
+            studentAbsenceData = [];
+
+            database.ref('attendance').once('value', (snapshot) => {
+                const attendanceData = snapshot.val();
+
+                students.forEach(student => {
+                    const absenceDatesSet = new Set();
+                    const absenceDetailSet = new Set();
+
+                    if (attendanceData) {
+                        Object.keys(attendanceData).forEach(date => {
+                            if (date >= startDate && date <= endDate) {
+                                const dateData = attendanceData[date];
+                                Object.keys(dateData).forEach(levelGroup => {
+                                    const parsed = parseLevelGroup(levelGroup);
+                                    const levelOK = String(parsed.level) === String(student.level);
+                                    const groupOK = String(parsed.group).toUpperCase() === String(student.group).toUpperCase();
+                                    if (!levelOK || !groupOK) return;
+
+                                    const levelGroupData = dateData[levelGroup];
+                                    Object.keys(levelGroupData).forEach(subject => {
+                                        const subjectData = levelGroupData[subject];
+                                        Object.keys(subjectData).forEach(time => {
+                                            const timeData = subjectData[time];
+                                            Object.keys(timeData).forEach(teacher => {
+                                                const teacherData = timeData[teacher];
+                                                if (!teacherData) return;
+                                                const keysInDB = Object.keys(teacherData);
+                                                const isAbsent = keysInDB.some(key =>
+                                                    (String(key) === String(student.code) || String(key) === String(student.id)) &&
+                                                    teacherData[key] === 'absent'
+                                                );
+                                                if (isAbsent) {
+                                                    absenceDatesSet.add(date);
+                                                    absenceDetailSet.add(`${date}__${subject}__${time}`);
+                                                }
+                                            });
+                                        });
+                                    });
+                                });
+                            }
+                        });
+                    }
+
+                    studentAbsenceData.push({
+                        student: student,
+                        totalAbsences: absenceDetailSet.size,
+                        absenceDates: Array.from(absenceDatesSet).sort()
+                    });
+                });
+
+                displayStudentAbsenceResults();
+            }).catch(error => {
+                alert('هەڵە لە بارکردنی داتاکانی غیابات');
+                console.error(error);
+            });
+        }
+
+        function displayStudentAbsenceResults() {
+            const resultsContainer = document.getElementById('studentAbsenceResults');
+            const statsContainer = document.getElementById('studentAbsenceStats');
+
+            if (studentAbsenceData.length === 0) {
+                resultsContainer.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-gray);">هیچ داتایەک نەدۆزرایەوە</p>';
+                statsContainer.style.display = 'none';
+                return;
+            }
+
+            const totalStudentsCount = studentAbsenceData.length;
+            const totalAbsencesCount = studentAbsenceData.reduce((sum, item) => sum + item.totalAbsences, 0);
+            const avgAbsences = totalAbsencesCount > 0 ? (totalAbsencesCount / totalStudentsCount).toFixed(1) : 0;
+
+            document.getElementById('totalStudentsFound').textContent = totalStudentsCount;
+            document.getElementById('totalAbsencesFound').textContent = totalAbsencesCount;
+            document.getElementById('averageAbsences').textContent = avgAbsences;
+            statsContainer.style.display = 'grid';
+
+            studentAbsenceData.sort((a, b) => b.totalAbsences - a.totalAbsences);
+
+            let resultsHTML = '';
+            studentAbsenceData.forEach(item => {
+                const student = item.student;
+
+                const absenceByMonth = {};
+                item.absenceDates.forEach(date => {
+                    const month = date.substring(0, 7);
+                    if (!absenceByMonth[month]) absenceByMonth[month] = [];
+                    absenceByMonth[month].push(date);
+                });
+
+                let absencePeriodsHTML = '';
+                Object.keys(absenceByMonth).forEach(month => {
+                    const dates = absenceByMonth[month];
+                    absencePeriodsHTML += `
+                        <div class="absence-period">
+                            <div class="period-title">مانگی ${month}</div>
+                            <div class="period-absences">
+                                ${dates.map(date => `<span class="absence-date">${date}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                resultsHTML += `
+                    <div class="student-absence-card">
+                        <div class="student-absence-header">
+                            <div class="student-absence-name">${student.name}</div>
+                            <div class="student-absence-count">${item.totalAbsences} غیاب</div>
+                        </div>
+                        <div class="student-absence-details">
+                            <div><strong>کۆد:</strong> ${student.code || '-'}</div>
+                            <div><strong>پۆل:</strong> ${student.level || '-'}${student.group || ''}</div>
+                        </div>
+                        ${item.totalAbsences > 0 ? `
+                            <div class="absence-periods">${absencePeriodsHTML}</div>
+                        ` : '<p style="text-align:center; color:#28a745; margin-top:10px;">✅ ئەم خوێندکارە هیچ غیاباتێکی نیە لەم ماوەیەدا</p>'}
+                    </div>
+                `;
+            });
+
+            resultsContainer.innerHTML = resultsHTML;
+        }
+
+        function exportStudentAbsence() {
+            if (studentAbsenceData.length === 0) {
+                alert('هیچ داتایەک نیە بۆ هەناردەکردن!');
+                return;
+            }
+            const startDate = document.getElementById('studentAbsenceStartDate').value || 'نادیار';
+            const endDate = document.getElementById('studentAbsenceEndDate').value || 'نادیار';
+
+            const data = studentAbsenceData.map(item => ({
+                'ناوی خوێندکار': item.student.name,
+                'کۆد': item.student.code || '',
+                'ئاست': item.student.level || '',
+                'گروپ': item.student.group || '',
+                'کۆی غیابات': item.totalAbsences,
+                'بەروارەکانی غیابات': item.absenceDates.join(', ')
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'کۆی غیابات');
+            XLSX.writeFile(wb, `کۆی_غیاباتی_خوێندکاران_${startDate}_تا_${endDate}.xlsx`);
+        }
+
+        function printStudentAbsence() {
+            if (studentAbsenceData.length === 0) {
+                alert('هیچ داتایەک نیە بۆ چاپکردن!');
+                return;
+            }
+            const startDate = document.getElementById('studentAbsenceStartDate').value || 'نادیار';
+            const endDate = document.getElementById('studentAbsenceEndDate').value || 'نادیار';
+            const totalStudents = document.getElementById('totalStudentsFound').textContent;
+            const totalAbsences = document.getElementById('totalAbsencesFound').textContent;
+            const averageAbsences = document.getElementById('averageAbsences').textContent;
+
+            let rows = '';
+            studentAbsenceData.forEach(item => {
+                rows += `
+                    <tr>
+                        <td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.student.name}</td>
+                        <td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.student.code || ''}</td>
+                        <td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.student.level || ''}</td>
+                        <td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.student.group || ''}</td>
+                        <td style="border:1px solid #ddd; padding:8px; text-align:center; font-weight:bold; color:#dc3545;">${item.totalAbsences}</td>
+                    </tr>
+                `;
+            });
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html dir="rtl"><head><meta charset="UTF-8">
+                <title>کۆی غیاباتی خوێندکاران</title>
+                <style>
+                    body { font-family: Tahoma, sans-serif; padding: 20px; }
+                    h1 { text-align:center; font-size:20px; }
+                    p { text-align:center; color:#555; }
+                    table { width:100%; border-collapse:collapse; margin-top:20px; }
+                    th { background:#059669; color:#fff; padding:10px; border:1px solid #ddd; }
+                </style></head>
+                <body>
+                    <h1>📊 کۆی غیاباتی خوێندکاران</h1>
+                    <p>لە ${startDate} تا ${endDate}</p>
+                    <p>کۆی خوێندکارەکان: ${totalStudents} &nbsp;|&nbsp; کۆی غیابات: ${totalAbsences} &nbsp;|&nbsp; تێکڕا: ${averageAbsences}</p>
+                    <table>
+                        <thead><tr>
+                            <th>ناوی خوێندکار</th><th>کۆد</th><th>ئاست</th><th>گرووپ</th><th>کۆی غیابات</th>
+                        </tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </body></html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 300);
+        }
+
+        function toggleTeacherMsgType() {
+            const type = document.getElementById('teacherMsgType').value;
+            const group = document.getElementById('teacherSingleGroup');
+            group.style.display = type === 'single' ? 'block' : 'none';
+        }
+
+        // ===== Send message to teacher(s) =====
+        async function sendTeacherMessage(event) {
+            event.preventDefault();
+            const type = document.getElementById('teacherMsgType').value;
+            const messageText = document.getElementById('teacherMsgText').value;
+            const btn = document.getElementById('teacherMsgSendBtn');
+            const originalHtml = btn.innerHTML;
+            const successNotice = document.getElementById('teacherMsgSuccess');
+            successNotice.classList.remove('active');
+
+            const buildMessage = (loginName) => ({
+                staffName: loginName,
+                staffDisplayName: loginName,
+                senderName: 'یاریدەدەری بەڕێوەبەر (' + currentAssistant.name + ')',
+                senderPhone: '',
+                message: messageText,
+                date: new Date().toISOString(),
+                read: false,
+                fromAdmin: true,
+                sentByAssistant: currentAssistant.username,
+                assistantSeenReply: true
+            });
+
+            btn.disabled = true;
+            try {
+                if (type === 'all') {
+                    if (teacherOptionsList.length === 0) {
+                        alert('هیچ مامۆستایەکی تۆمارکراو نییە');
+                        btn.disabled = false;
+                        return;
+                    }
+                    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ناردن...`;
+                    for (const name of teacherOptionsList) {
+                        await database.ref('staffMessages').push(buildMessage(name));
+                    }
+                    const teacherUsernames = teacherOptionsList.map(n => teacherNameToUsername[n]).filter(Boolean);
+                    sendPushNotification({ externalIds: teacherUsernames }, 'پەیامی نوێ لە یاریدەدەر', messageText);
+                } else {
+                    const name = document.getElementById('teacherMsgName').value.trim();
+                    if (!name) {
+                        alert('تکایە مامۆستایەک هەڵبژێرە');
+                        btn.disabled = false;
+                        return;
+                    }
+                    await database.ref('staffMessages').push(buildMessage(name));
+                    sendPushNotification({ externalId: teacherNameToUsername[name] || name }, 'پەیامی نوێ لە یاریدەدەر', messageText);
+                }
+                document.getElementById('teacherMsgText').value = '';
+                document.getElementById('teacherMsgName').value = '';
+                successNotice.classList.add('active');
+            } catch (err) {
+                alert('نەتوانرا پەیامەکە بنێردرێت');
+            }
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+
+        // ===== Send announcement to all guardians =====
+        function sendGuardianAnnouncement(event) {
+            event.preventDefault();
+            const btn = document.getElementById('announceSendBtn');
+            const originalHtml = btn.innerHTML;
+            const successNotice = document.getElementById('announceSuccess');
+            successNotice.classList.remove('active');
+
+            const data = {
+                title: document.getElementById('announceTitle').value,
+                message: document.getElementById('announceMessage').value,
+                priority: document.getElementById('announcePriority').value,
+                date: new Date().toISOString()
+            };
+
+            btn.disabled = true;
+            database.ref('announcements').push(data)
+                .then(() => {
+                    sendPushNotification({ role: 'guardian' }, data.title, data.message);
+                    document.getElementById('announceTitle').value = '';
+                    document.getElementById('announceMessage').value = '';
+                    document.getElementById('announcePriority').value = 'ئاسایی';
+                    successNotice.classList.add('active');
+                })
+                .catch(() => {
+                    alert('نەتوانرا ئاگاداریەکە بنێردرێت');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                });
+        }
+    </script>
+    <script src="onesignal-init.js"></script>
+</body>
+</html>

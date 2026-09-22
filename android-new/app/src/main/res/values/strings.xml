@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CISAPP</string>
+    <string name="title_activity_main">CISAPP</string>
+    <string name="package_name">com.it.cis.sul</string>
+    <string name="custom_url_scheme">com.it.cis.sul</string>
+</resources>

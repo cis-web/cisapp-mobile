@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <script>
+        // First-launch onboarding: send brand-new users to the notification
+        // setup guide once, before the menu page renders. Runs as early as
+        // possible in <head> to avoid a flash of the menu page first.
+        // Subsequent visits (flag already set) skip straight through.
+        (function () {
+            try {
+                if (!localStorage.getItem('cisNotificationSetupSeen')) {
+                    window.location.replace('notification-setup.html?first=1');
+                }
+            } catch (e) { /* localStorage unavailable — just show the menu */ }
+        })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستەمی پەیمانگەی کۆمپیوتەری سلێمانی</title>
+    
+ <link rel="icon" type="image/jpeg" href="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107">
+
+<link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107">
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107">
+
+<link rel="apple-touch-icon" sizes="152x152" href="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107">
+
+<link rel="apple-touch-icon" sizes="120x120" href="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="CIS Sulaimany">
+    
+    <meta name="theme-color" content="#00bfff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="سیستەمی بەڕێوەبردنی پەیمانگەی کۆمپیوتەری سلێمانی">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #00bfff;
+            --primary-dark: #008ab8;
+            --secondary: #00bfff;
+            --success: #10b981;
+            --info: #00bfff;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --white: #ffffff;
+            --light-bg: #f8fafc;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --border: #e2e8f0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00bfff 0%, #008ab8 100%);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+        
+        .mobile-header {
+            background: var(--white);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .mobile-menu-btn, .mobile-user {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--light-bg);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-btn:active, .mobile-user:active {
+            transform: scale(0.95);
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .mobile-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            flex: 1;
+            text-align: center;
+            padding: 0 10px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+            animation: fadeIn 0.5s ease;
+            background: var(--light-bg);
+            min-height: 100vh;
+        }
+        
+        .content-wrapper {
+            padding: 0 12px 16px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 0;
+            padding: 20px 16px 30px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        
+        
+        .institute-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 3px solid var(--white);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            background-color: white;
+            padding: 6px;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .header h1 {
+            color: var(--white);
+            font-size: 18px;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            margin-top: 12px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+            min-width: 220px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                max-height: 500px;
+            }
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #f0f7ff;
+            padding-left: 26px;
+        }
+
+        .dropdown-item i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Center Teacher Dashboard Section */
+        .teacher-center-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 16px;
+            min-height: 450px;
+        }
+
+        .teacher-dashboard-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            cursor: pointer;
+        }
+
+        .teacher-dashboard-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 12px 32px rgba(0,191,255,0.25);
+        }
+
+        .teacher-icon-container {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: white;
+        }
+
+        .teacher-dashboard-text h2 {
+            color: var(--primary);
+            font-size: 22px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .teacher-dashboard-text p {
+            color: var(--text-gray);
+            font-size: 15px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .teacher-login-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin-top: 8px;
+        }
+
+        .teacher-login-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #006699);
+            transform: translateX(-4px);
+            box-shadow: 0 4px 12px rgba(0,191,255,0.3);
+        }
+
+        .main-menu-cards {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            padding: 30px 8px;
+            flex-wrap: wrap;
+        }
+
+        .menu-card-container {
+            position: relative;
+            flex: 1;
+            min-width: 140px;
+            max-width: 220px;
+        }
+
+        .menu-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            width: 100%;
+            min-width: 140px;
+            max-width: 220px;
+            padding: 32px 16px;
+            background: var(--white);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .menu-card:hover, .menu-card:active {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(0,191,255,0.2);
+        }
+
+        .menu-card-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .menu-card span {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .dropdown-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: auto;
+            min-width: 240px;
+            max-width: calc(100vw - 24px);
+        }
+
+        @media (min-width: 1024px) {
+            .menu-card-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+            }
+
+            .menu-card {
+                padding: 44px 24px;
+            }
+
+            .menu-card span {
+                font-size: 17px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .main-menu-cards {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 20px 12px;
+            }
+
+            .menu-card-container {
+                min-width: 0;
+                max-width: none;
+                width: 100%;
+            }
+
+            .menu-card {
+                min-width: 0;
+                max-width: none;
+                width: 100%;
+                padding: 22px 10px;
+                gap: 10px;
+            }
+
+            .menu-card-icon {
+                width: 52px;
+                height: 52px;
+                font-size: 22px;
+            }
+
+            .menu-card span {
+                font-size: 13px;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            padding: 20px 16px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            margin-top: 30px;
+        }
+        
+        .developer-info {
+            color: var(--text-gray);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        
+        .developer-info strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                padding: 0;
+            }
+            
+            .content-wrapper {
+                padding: 30px 24px;
+            }
+            
+            .header {
+                padding: 32px;
+                margin-bottom: 30px;
+                border-radius: 20px;
+            }
+            
+            .institute-logo {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .header h1 {
+                font-size: 26px;
+            }
+            
+            .header p {
+                font-size: 16px;
+            }
+
+            .teacher-center-section {
+                padding: 50px 24px;
+                min-height: 550px;
+            }
+
+            .teacher-dashboard-card {
+                max-width: 480px;
+                padding: 40px 32px;
+            }
+
+            .teacher-icon-container {
+                width: 120px;
+                height: 120px;
+                font-size: 60px;
+            }
+
+            .teacher-dashboard-text h2 {
+                font-size: 24px;
+            }
+
+            .teacher-dashboard-text p {
+                font-size: 16px;
+            }
+
+            .teacher-login-btn {
+                padding: 14px 36px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="showMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="mobile-title">CIS Sulaimany</div>
+        <div class="mobile-user" onclick="showProfile(event)">
+            <i class="fas fa-user"></i>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://firebasestorage.googleapis.com/v0/b/promohouse-b5298.firebasestorage.app/o/logo-cis.jpg?alt=media&token=23f830c2-7c4b-4851-9c37-5a9e87a6c107"
+                     alt="پەیمانگەی کۆمپیوتەری سلێمانی"
+                     class="institute-logo"
+                     id="main-logo">
+            </div>
+            <h1>پەیمانگەی کۆمپیوتەری سلێمانی</h1>
+            <p>سیستەمی بەڕێوەبردنی پەیمانگە</p>
+        </div>
+        
+        <div class="content-wrapper">
+
+            <!-- Hidden admin access: no visible button; reveal only via a secret trigger on the profile icon (see script) -->
+            <div class="menu-card-container" id="adminSecretContainer" style="position: static; width: 0; height: 0; margin: 0; padding: 0; overflow: visible;">
+                <div class="dropdown-menu" id="adminDropdown">
+                    <a href="admin.html" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>داشبۆردی بەڕێوەبەر</span>
+                    </a>
+                    <a href="staff.html" class="dropdown-item">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>کارمەندی غیابات</span>
+                    </a>
+                    <a href="assistant.html" class="dropdown-item">
+                        <i class="fas fa-user-shield"></i>
+                        <span>یاریدەدەری بەڕێوەبەر</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Menu Cards -->
+            <div class="main-menu-cards">
+                <a href="teacher.html" class="menu-card">
+                    <div class="menu-card-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <span>داشبۆردی مامۆستایان</span>
+                </a>
+
+                <a href="employee.html" class="menu-card">
+                    <div class="menu-card-icon"><i class="fas fa-id-card"></i></div>
+                    <span>داشبۆردی فەرمانبەران</span>
+                </a>
+
+                <a href="student.html" class="menu-card">
+                    <div class="menu-card-icon"><i class="fas fa-user-graduate"></i></div>
+                    <span>داشبۆردی خوێندکار</span>
+                </a>
+
+                <a href="guardian.html" class="menu-card">
+                    <div class="menu-card-icon"><i class="fas fa-user-friends"></i></div>
+                    <span>داشبۆردی بەخێوکار</span>
+                </a>
+
+                <div class="menu-card-container">
+                    <button class="menu-card" onclick="toggleSystemsGroupDropdown(this)">
+                        <div class="menu-card-icon"><i class="fas fa-bars"></i></div>
+                        <span>سیستەمەکان</span>
+                    </button>
+                    <div class="dropdown-menu" id="systemsGroupDropdown">
+                        <a href="amar_fixed.html" class="dropdown-item">
+                            <i class="fas fa-suitcase"></i>
+                            <span>سیستەمی ئامار</span>
+                        </a>
+                        <a href="book.html" class="dropdown-item">
+                            <i class="fas fa-book"></i>
+                            <span>سیستەمی کتێبخانە</span>
+                        </a>
+                        <a href="https://research-system-cis.vercel.app/" target="_blank" class="dropdown-item">
+                            <i class="fas fa-search"></i>
+                            <span>سیستەمی توێژینەوە</span>
+                        </a>
+                    </div>
+                </div>
+
+                <a href="staff-directory.html" class="menu-card">
+                    <div class="menu-card-icon"><i class="fas fa-id-badge"></i></div>
+                    <span>ستافی پەیمانگە</span>
+                </a>
+
+                <a href="notification-setup.html" class="menu-card">
+                    <div class="menu-card-icon"><i class="fas fa-bell"></i></div>
+                    <span>چالاککردنی ئاگاداری</span>
+                </a>
+
+                <a href="archive.html" class="menu-card">
+                    <div class="menu-card-icon"><i class="fas fa-trophy"></i></div>
+                    <span>ئەرشیفی سەرکەوتووان</span>
+                </a>
+
+                <a href="about.html" class="menu-card">
+                    <div class="menu-card-icon"><i class="fas fa-info-circle"></i></div>
+                    <span>دەربارە و پەیوەندی</span>
+                </a>
+            </div>
+
+            <div class="footer">
+                <div class="developer-info">
+                    <strong>ئەم سیستەمە لەلایەن ماجدانور دروستکراوە</strong>
+                    <div>پەیوەندی@2025: -7701458474</div>
+                    <div style="margin-top: 6px; color: #94a3b8; font-size: 10px;">
+                        © 2025 پەیمانگەی کۆمپیوتەری سلێمانی
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            const logo = document.getElementById('main-logo');
+            logo.addEventListener('error', function() {
+                console.error('کێشەیەک لە بارکردنی لۆگۆدا هەیە');
+                this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiMwMDg4Y2MiLz4KPHRleHQgeD0iNDAiIHk9IjQ1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsIj5DSVM8L3RleHQ+Cjwvc3ZnPg==';
+            });
+        });
+
+        function positionDropdown(dropdown, btn) {
+            const rect = btn.getBoundingClientRect();
+            const dropdownWidth = Math.max(240, rect.width);
+            let left = rect.left + (rect.width / 2) - (dropdownWidth / 2);
+            left = Math.max(12, Math.min(left, window.innerWidth - dropdownWidth - 12));
+
+            const margin = 12;
+            const spaceBelow = window.innerHeight - rect.bottom - margin - 10;
+            const spaceAbove = rect.top - margin - 10;
+
+            dropdown.style.width = dropdownWidth + 'px';
+            dropdown.style.left = left + 'px';
+
+            if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+                dropdown.style.top = (rect.bottom + 10) + 'px';
+                dropdown.style.bottom = 'auto';
+                dropdown.style.maxHeight = Math.max(150, spaceBelow) + 'px';
+            } else {
+                dropdown.style.top = 'auto';
+                dropdown.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
+                dropdown.style.maxHeight = Math.max(150, spaceAbove) + 'px';
+            }
+            dropdown.style.overflowY = 'auto';
+        }
+
+        function toggleMenuDropdown(dropdownId, btn) {
+            const dropdown = document.getElementById(dropdownId);
+            const isOpening = !dropdown.classList.contains('active');
+
+            // Close all other dropdowns first
+            document.querySelectorAll('.dropdown-menu.active').forEach(d => {
+                if (d !== dropdown) d.classList.remove('active');
+            });
+
+            if (isOpening && btn) {
+                positionDropdown(dropdown, btn);
+            }
+
+            dropdown.classList.toggle('active');
+        }
+
+        function toggleSystemsGroupDropdown(btn) {
+            toggleMenuDropdown('systemsGroupDropdown', btn);
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            document.querySelectorAll('.menu-card-container').forEach(container => {
+                if (!container.contains(event.target)) {
+                    const dropdown = container.querySelector('.dropdown-menu');
+                    if (dropdown) dropdown.classList.remove('active');
+                }
+            });
+        });
+
+        // Close dropdowns on scroll to avoid misalignment (they're fixed-positioned)
+        window.addEventListener('scroll', function() {
+            document.querySelectorAll('.dropdown-menu.active').forEach(d => {
+                d.classList.remove('active');
+            });
+        }, { passive: true });
+
+        function showMenu() {
+            alert('لیستی سیستەمەکان لە سەرەوە پیشان دراوە');
+        }
+
+        // Hidden admin access: click the profile icon, then enter the code.
+        // Only the admin should know this code — change ADMIN_ACCESS_CODE to whatever code you like.
+        const ADMIN_ACCESS_CODE = '1234';
+
+        function showProfile(event) {
+            if (event) event.stopPropagation();
+
+            const code = prompt('کۆدی چوونەژوورەوە بنووسە:');
+            if (code === null) return;
+
+            if (code === ADMIN_ACCESS_CODE) {
+                const dropdown = document.getElementById('adminDropdown');
+                const btn = document.querySelector('.mobile-user');
+                document.querySelectorAll('.dropdown-menu.active').forEach(d => {
+                    if (d !== dropdown) d.classList.remove('active');
+                });
+                positionDropdown(dropdown, btn);
+                dropdown.classList.add('active');
+            } else {
+                alert('کۆدەکە هەڵەیە');
+            }
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
