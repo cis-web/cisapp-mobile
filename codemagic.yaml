@@ -1,3 +1,4 @@
+@'
 workflows:
   ios-capacitor-workflow:
     name: CISAPP iOS Workflow
@@ -8,11 +9,11 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.it.cis.sul
+        bundle_identifier: com.it.cis.sulapp
       vars:
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
-        APP_ID: "com.it.cis.sul"
+        APP_ID: "com.it.cis.sulapp"
       node: 20
       xcode: latest
       cocoapods: default
@@ -36,21 +37,17 @@ workflows:
       - name: Set up code signing
         script: |
           keychain initialize
-          app-store-connect fetch-signing-files "$APP_ID" \
-            --type IOS_APP_STORE \
-            --create
+          app-store-connect fetch-signing-files "$APP_ID" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
       - name: Increment build number
         script: |
           cd $CM_BUILD_DIR
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID" || echo 1)
-          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+          agvtool new-version -all $((LATEST_BUILD_NUMBER + 1))
       - name: Build ipa for distribution
         script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
+          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
@@ -60,3 +57,4 @@ workflows:
       app_store_connect:
         auth: integration
         submit_to_testflight: true
+'@ | Set-Content codemagic.yaml
