@@ -13,6 +13,7 @@ workflows:
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
         APP_ID: "com.it.cis.sulapp"
+        APP_STORE_APPLE_ID: "6814812470"
       node: 20
       xcode: latest
       cocoapods: default
@@ -43,7 +44,7 @@ workflows:
         script: |
           set -e
           cd $CM_BUILD_DIR/ios/App
-          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number "$APP_ID")
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number "$APP_STORE_APPLE_ID")
           echo "Latest build number from App Store Connect: $LATEST_BUILD_NUMBER"
           NEW_BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
           echo "Setting new build number to: $NEW_BUILD_NUMBER"
