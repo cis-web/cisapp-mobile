@@ -15,7 +15,7 @@ workflows:
         APP_ID: "com.it.cis.sulapp"
         APP_STORE_APPLE_ID: "6814812470"
       node: 20
-      xcode: latest
+      xcode: 26.5
       cocoapods: default
     triggering:
       events:
