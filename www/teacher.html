@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سیستەمی داشبۆردی مامۆستایان / پەیمانگەی کۆمپیوتەری سلێمانی</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js" defer></script>
     <style>
         * {
             margin: 0;
@@ -110,6 +108,25 @@
         .qr-scan-btn:hover {
             background: rgba(0,191,255,0.08);
         }
+
+        /* ===== گۆڕینی وشەی نهێنی ===== */
+        .pw-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9500; align-items:center; justify-content:center; padding:16px; }
+        .pw-overlay.active { display:flex; }
+        .pw-box { background:#fff; border-radius:16px; width:100%; max-width:420px; padding:22px; box-shadow:0 10px 40px rgba(0,0,0,0.3); max-height:92vh; overflow-y:auto; }
+        .pw-box h3 { margin:0 0 14px; font-size:18px; color:var(--dark); }
+        .pw-field { position:relative; margin-bottom:12px; }
+        .pw-field label { display:block; font-size:13px; font-weight:600; color:var(--dark); margin-bottom:5px; }
+        .pw-field input { width:100%; padding:12px 14px 12px 42px; border:2px solid #e2e8f0; border-radius:10px; font-size:15px; font-family:inherit; box-sizing:border-box; }
+        .pw-field input:focus { outline:none; border-color:var(--primary); }
+        .pw-eye { position:absolute; left:6px; bottom:4px; background:none; border:none; padding:10px; color:var(--gray); cursor:pointer; font-size:15px; }
+        .pw-msg { display:none; padding:10px 12px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px; }
+        .pw-msg.error { display:block; background:#fee2e2; color:#b91c1c; }
+        .pw-msg.ok { display:block; background:#d1fae5; color:#047857; }
+        .pw-actions { display:flex; gap:10px; }
+        .pw-actions button { flex:1; padding:12px; border-radius:10px; border:none; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; }
+        .pw-save { background:var(--primary); color:#fff; }
+        .pw-save:disabled { opacity:.6; cursor:not-allowed; }
+        .pw-cancel { background:#e5e7eb; color:var(--dark); }
 
         .qr-scanner-overlay {
             display: none;
@@ -555,6 +572,11 @@
             border-color: var(--primary);
         }
         
+        .attendance-card.ambiguous-attendance {
+            border-color: #ffc107;
+            background: #fffbf0;
+        }
+        
         .student-info-attendance {
             flex: 1;
         }
@@ -796,6 +818,34 @@
     </style>
 </head>
 <body>
+    <script>
+        // Guard against "stray tap" clicks: on mobile, when this page takes a
+        // moment to finish loading (Firebase SDK, etc.), users sometimes tap
+        // the previous page's button 2-3 times out of impatience. Those extra
+        // taps then land here the instant the page becomes visible and can
+        // accidentally trigger buttons like "سکانی بارکۆد بۆ چوونەژوورەوە"
+        // (opening the QR-scanner modal) without the user meaning to. This
+        // swallows any click/touch for a short window right after load.
+        (function guardAgainstStrayTaps() {
+            const GUARD_MS = 600;
+            const guardUntil = Date.now() + GUARD_MS;
+            function block(e) {
+                if (Date.now() < guardUntil) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                } else {
+                    document.removeEventListener('click', block, true);
+                    document.removeEventListener('touchend', block, true);
+                }
+            }
+            document.addEventListener('click', block, true);
+            document.addEventListener('touchend', block, true);
+            setTimeout(() => {
+                document.removeEventListener('click', block, true);
+                document.removeEventListener('touchend', block, true);
+            }, GUARD_MS + 50);
+        })();
+    </script>
     <!-- Login Page -->
     <div id="loginPage" class="container">
         <div class="header">
@@ -907,6 +957,10 @@
                 <button class="action-btn" onclick="switchTeacherSection('onlineClass')">
                     <i class="fas fa-video"></i>
                     <span>وانەی ئۆنلاین (Google Meet)</span>
+                </button>
+                <button class="action-btn" onclick="openChangePasswordModal()">
+                    <i class="fas fa-key"></i>
+                    <span>گۆڕینی وشەی نهێنی</span>
                 </button>
             </div>
         </div>
@@ -1421,6 +1475,33 @@
         
         <div class="developer-info">
             ئەم ئەپە لەلایەن ماجدانوەر دروستکراوە@2025 | پەیوەندی:07701458474
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="pw-overlay">
+        <div class="pw-box">
+            <h3><i class="fas fa-key"></i> گۆڕینی وشەی نهێنی</h3>
+            <div id="pwMsg" class="pw-msg"></div>
+            <div class="pw-field">
+                <label for="pwCurrent">وشەی نهێنی ئێستا</label>
+                <input type="password" id="pwCurrent" autocomplete="current-password">
+                <button type="button" class="pw-eye" onclick="togglePwVisibility('pwCurrent', this)"><i class="fas fa-eye"></i></button>
+            </div>
+            <div class="pw-field">
+                <label for="pwNew">وشەی نهێنی نوێ (کەمتر نەبێت لە 6 پیت)</label>
+                <input type="password" id="pwNew" autocomplete="new-password">
+                <button type="button" class="pw-eye" onclick="togglePwVisibility('pwNew', this)"><i class="fas fa-eye"></i></button>
+            </div>
+            <div class="pw-field">
+                <label for="pwConfirm">دووپاتکردنەوەی وشەی نهێنی نوێ</label>
+                <input type="password" id="pwConfirm" autocomplete="new-password">
+                <button type="button" class="pw-eye" onclick="togglePwVisibility('pwConfirm', this)"><i class="fas fa-eye"></i></button>
+            </div>
+            <div class="pw-actions">
+                <button type="button" class="pw-save" id="pwSaveBtn" onclick="submitChangePassword()"><i class="fas fa-save"></i> پاشەکەوتکردن</button>
+                <button type="button" class="pw-cancel" onclick="closeChangePasswordModal()">پاشگەزبوونەوە</button>
+            </div>
         </div>
     </div>
 
@@ -2039,31 +2120,52 @@
                     return;
                 }
                 
+                // ژمارەی چەند خوێندکار هەمان کۆدیان هەیە لەم گروپەدا (بۆ دۆزینەوەی کۆدی دووبارە)
+                const codeOccurrences = {};
+                currentStudentsInGroup.forEach(s => {
+                    codeOccurrences[s.code] = (codeOccurrences[s.code] || 0) + 1;
+                });
+                
                 currentStudentsInGroup.forEach((student) => {
-                    // تەنها ئەگەر کۆدی خوێندکار لە داتابەیس بوو = غیاب، وەک غیاب نیشان بدە
-                    const currentStatus = attendanceData[student.code] === 'absent' ? 'absent' : 'present';
+                    // یەکەم گەڕان بەپێی id (نوێ، هەمیشە یەکتایە) - ئەمە هەمیشە دروستە
+                    let currentStatus = 'present';
+                    let isAmbiguousLegacy = false;
+                    
+                    if (attendanceData[student.id] === 'absent') {
+                        currentStatus = 'absent';
+                    } else if (attendanceData[student.id] === undefined && attendanceData[student.code] === 'absent') {
+                        // داتای کۆن (بەپێی کۆد) - تەنها ئەگەر کۆدەکە لەم گروپەدا یەکتا بێت پشتی پێ ببەستە
+                        // ئەگەر کۆدەکە دووبارە بێت، بە خۆکاری غیاب دایمەنێ چونکە ڕوونادات کامیان بووە
+                        if (codeOccurrences[student.code] === 1) {
+                            currentStatus = 'absent';
+                        } else {
+                            isAmbiguousLegacy = true;
+                        }
+                    }
                     
                     const card = document.createElement('div');
-                    card.className = 'attendance-card';
+                    card.className = 'attendance-card' + (isAmbiguousLegacy ? ' ambiguous-attendance' : '');
                     card.setAttribute('data-student-code', student.code);
+                    card.setAttribute('data-student-id', student.id);
                     
                     card.innerHTML = `
                         <div class="student-info-attendance">
                             <span class="student-name-large">${student.name}</span>
                             <span class="student-details">کۆد: ${student.code} | ${student.institute}</span>
+                            ${isAmbiguousLegacy ? '<div style="background:#fff3cd; color:#856404; padding:6px 10px; border-radius:6px; font-size:12px; margin-top:6px;">⚠️ کۆدی ئەم خوێندکارە لەگەڵ خوێندکارێکی تر یەکسانە و داتای کۆن نادیارە - تکایە بەدەستی دڵنیابەرەوە لەم دانیشتنە ئایا ئامادە بووە یان نا</div>' : ''}
                         </div>
                         <div class="attendance-checkbox">
                             <div class="checkbox-item">
-                                <input type="radio" id="present_${student.code}" name="attendance_${student.code}" value="present" 
+                                <input type="radio" id="present_${student.id}" name="attendance_${student.id}" value="present" 
                                     ${currentStatus === 'present' ? 'checked' : ''}>
-                                <label for="present_${student.code}" class="checkbox-label present-checkbox">
+                                <label for="present_${student.id}" class="checkbox-label present-checkbox">
                                     <i class="fas fa-check-circle"></i> ئامادە
                                 </label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="radio" id="absent_${student.code}" name="attendance_${student.code}" value="absent" 
+                                <input type="radio" id="absent_${student.id}" name="attendance_${student.id}" value="absent" 
                                     ${currentStatus === 'absent' ? 'checked' : ''}>
-                                <label for="absent_${student.code}" class="checkbox-label absent-checkbox">
+                                <label for="absent_${student.id}" class="checkbox-label absent-checkbox">
                                     <i class="fas fa-times-circle"></i> غیاب
                                 </label>
                             </div>
@@ -2107,14 +2209,14 @@
             let absentCount = 0;
             
             currentStudentsInGroup.forEach((student) => {
-                const radio = document.querySelector(`input[name="attendance_${student.code}"]:checked`);
+                const radio = document.querySelector(`input[name="attendance_${student.id}"]:checked`);
                 const status = radio ? radio.value : 'present';
                 
                 if (status === 'present') {
                     presentCount++;
                 } else {
-                    // فەقەت غیابەکان خەزن بکە
-                    absentData[student.code] = 'absent';
+                    // فەقەت غیابەکان خەزن بکە - بە id (یەکتا) نەک بە کۆد، چونکە کۆد لەوانەیە دووبارە بێت
+                    absentData[student.id] = 'absent';
                     absentCount++;
                 }
             });
@@ -3176,13 +3278,18 @@
                                         if (attendanceData[studentCode] === 'absent') {
                                             console.log('🎯 گەڕان بەدوای خوێندکار:', studentCode, 'ئاست:', levelFromPath);
                                             
-                                            // بگەڕێ بەپێی کۆد + ئاست + گروپ تا کێشەی دوبارەبوون نەبێت
                                             absenceDiagnostics.raw++;
-                                            let student = allStudents.find(s => 
-                                                String(s.code) === String(studentCode) && 
-                                                String(s.level) === String(levelFromPath) &&
-                                                String(s.group).toUpperCase() === String(groupFromPath).toUpperCase()
-                                            );
+                                            // یەکەم هەوڵ: گەڕان بەپێی id (یەکتایە، کێشەی دووبارەبوون نییە)
+                                            let student = allStudents.find(s => String(s.id) === String(studentCode));
+                                            
+                                            // بۆ داتای کۆن (پێش چاکسازی): بگەڕێ بەپێی کۆد + ئاست + گروپ
+                                            if (!student) {
+                                                student = allStudents.find(s => 
+                                                    String(s.code) === String(studentCode) && 
+                                                    String(s.level) === String(levelFromPath) &&
+                                                    String(s.group).toUpperCase() === String(groupFromPath).toUpperCase()
+                                                );
+                                            }
                                             
                                             // ئەگەر گرووپی خوێندکار دوای تۆمارکردن گۆڕدرابێت، بە کۆد + ئاست بیدۆزەرەوە (تەنها ئەگەر یەک خوێندکار بێت)
                                             if (!student) {
@@ -3556,6 +3663,86 @@
             }, 3000);
         }
 
+        // ===== گۆڕینی وشەی نهێنی =====
+        function openChangePasswordModal() {
+            ['pwCurrent', 'pwNew', 'pwConfirm'].forEach(id => {
+                const el = document.getElementById(id);
+                el.value = '';
+                el.type = 'password';
+            });
+            document.querySelectorAll('.pw-eye i').forEach(i => i.className = 'fas fa-eye');
+            const msg = document.getElementById('pwMsg');
+            msg.className = 'pw-msg';
+            msg.textContent = '';
+            document.getElementById('pwSaveBtn').disabled = false;
+            document.getElementById('changePasswordModal').classList.add('active');
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.remove('active');
+        }
+
+        function togglePwVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            btn.querySelector('i').className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+        }
+
+        function showPwMessage(text, type) {
+            const msg = document.getElementById('pwMsg');
+            msg.textContent = text;
+            msg.className = 'pw-msg ' + type;
+        }
+
+        function submitChangePassword() {
+            if (!currentUser || !currentUser.username) {
+                showPwMessage('تکایە دووبارە بچۆ ژوورەوە', 'error');
+                return;
+            }
+            const current = document.getElementById('pwCurrent').value.trim();
+            const newPw = document.getElementById('pwNew').value.trim();
+            const confirmPw = document.getElementById('pwConfirm').value.trim();
+
+            if (!current || !newPw || !confirmPw) { showPwMessage('تکایە هەموو خانەکان پڕ بکەرەوە', 'error'); return; }
+            if (newPw.length < 6) { showPwMessage('وشەی نهێنی نوێ دەبێت لانیکەم 6 پیت بێت', 'error'); return; }
+            if (newPw !== confirmPw) { showPwMessage('وشەی نهێنی نوێ و دووپاتکردنەوەکەی وەک یەک نین', 'error'); return; }
+            if (newPw === current) { showPwMessage('وشەی نهێنی نوێ دەبێت جیاواز بێت لە ئێستا', 'error'); return; }
+
+            const btn = document.getElementById('pwSaveBtn');
+            btn.disabled = true;
+            const ref = database.ref('teachers/' + currentUser.username + '/password');
+
+            // یەکەم: دڵنیابوونەوە لە وشەی نهێنی ئێستا (لە داتابەیس)
+            ref.once('value').then(snapshot => {
+                if (snapshot.val() !== current) {
+                    showPwMessage('وشەی نهێنی ئێستا هەڵەیە', 'error');
+                    btn.disabled = false;
+                    return null;
+                }
+                return ref.set(newPw).then(() => {
+                    currentUser.password = newPw;
+                    // ئەگەر "بیرم بێتەوە" چالاک بووە، وشەی نهێنی پاشەکەوتکراو نوێ بکەرەوە
+                    try {
+                        const saved = localStorage.getItem('teacherAutoLogin');
+                        if (saved) {
+                            const data = JSON.parse(saved);
+                            if (data && data.username === currentUser.username) {
+                                data.password = newPw;
+                                localStorage.setItem('teacherAutoLogin', JSON.stringify(data));
+                            }
+                        }
+                    } catch (e) {}
+                    showPwMessage('وشەی نهێنی بە سەرکەوتوویی گۆڕدرا ✅', 'ok');
+                    setTimeout(closeChangePasswordModal, 1600);
+                });
+            }).catch(err => {
+                console.error(err);
+                showPwMessage('هەڵەیەک ڕوویدا، دووبارە هەوڵبدەرەوە', 'error');
+                btn.disabled = false;
+            });
+        }
+
         // Logout
         function logout() {
             currentUser = null;
@@ -3573,5 +3760,6 @@
         });
     </script>
     <script src="onesignal-init.js"></script>
+
 </body>
 </html>
