@@ -1277,7 +1277,8 @@
                         <option value="PRO-A">گرووپی PRO-A</option>
                         <option value="PRO-B">گرووپی PRO-B</option>
                     </select>
-                    <button class="action-btn" onclick="searchStudentAbsence()" style="padding: 10px 20px; background: var(--danger);">گەڕان</button>
+                    <button class="action-btn" onclick="studentAbsenceView='cards'; searchStudentAbsence()" style="padding: 10px 20px; background: var(--danger);">گەڕان</button>
+                    <button class="action-btn" onclick="studentAbsenceView='hours'; searchStudentAbsence()" style="padding: 10px 20px; background: var(--primary-dark);">⏱️ کاتژمێر و ڕۆژی غیاب</button>
                 </div>
                 
                 <div class="filter-container" style="margin-top: 15px;">
@@ -1317,6 +1318,59 @@
 const database = firebase.database();
 const auth = firebase.auth();
 let currentUser = null;
+
+        // ===== کاتژمێر و ڕۆژی غیاب =====
+        // هەر ٤ کاتژمێر غیاب = ١ ڕۆژ (دەتوانیت ئەم ژمارەیە بگۆڕیت)
+        const HOURS_PER_ABSENCE_DAY = 4;
+        let studentAbsenceView = 'cards';
+
+        function hoursToDays(hours) {
+            return Math.floor(hours / HOURS_PER_ABSENCE_DAY);
+        }
+
+        function renderStudentHoursTable() {
+            const resultsContainer = document.getElementById('studentAbsenceResults');
+            const totalHours = studentAbsenceData.reduce((sum, i) => sum + i.totalAbsences, 0);
+            const totalDays = studentAbsenceData.reduce((sum, i) => sum + hoursToDays(i.totalAbsences), 0);
+
+            let rows = '';
+            studentAbsenceData.forEach((item, idx) => {
+                const hours = item.totalAbsences;
+                const days = hoursToDays(hours);
+                const rest = hours % HOURS_PER_ABSENCE_DAY;
+                const dayColor = days > 0 ? 'var(--danger)' : 'var(--success)';
+                rows += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td style="text-align: right; font-weight: 600;">${item.student.name}</td>
+                        <td>${item.student.code}</td>
+                        <td><span style="color: var(--danger); font-weight: bold;">${hours}</span></td>
+                        <td>
+                            <span style="color: ${dayColor}; font-weight: bold; font-size: 16px;">${days}</span>
+                            ${rest > 0 && days > 0 ? `<div style="font-size: 11px; color: var(--gray);">+ ${rest} کاتژمێر</div>` : ''}
+                        </td>
+                    </tr>`;
+            });
+
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; margin: 10px 0; color: var(--gray); font-size: 13px;">
+                    هەر ${HOURS_PER_ABSENCE_DAY} کاتژمێر غیاب = 1 ڕۆژ غیاب | کۆی کاتژمێر: <b>${totalHours}</b> | کۆی ڕۆژ: <b>${totalDays}</b>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ناوی خوێندکار</th>
+                                <th>کۆد</th>
+                                <th>ژمارەی کاتژمێر</th>
+                                <th>ژمارەی ڕۆژ</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>`;
+        }
 
         // فەنکشنی نوێ بۆ کردنەوەی مۆدالی کۆی غیاباتی خوێندکار
         function openStudentAbsenceModal() {
@@ -1483,6 +1537,12 @@ let currentUser = null;
             // نیشاندانی خوێندکارەکان بەپێی ژمارەی غیابات (کەم بۆ زۆر)
             studentAbsenceData.sort((a, b) => b.totalAbsences - a.totalAbsences);
             
+            if (studentAbsenceView === 'hours') {
+                renderStudentHoursTable();
+                showNotification('سەرکەوتوو', `${totalStudentsCount} خوێندکار دۆزرایەوە`, 'success');
+                return;
+            }
+            
             let resultsHTML = '';
             
             studentAbsenceData.forEach(item => {
@@ -1517,7 +1577,7 @@ let currentUser = null;
                     <div class="student-absence-card">
                         <div class="student-absence-header">
                             <div class="student-absence-name">${student.name}</div>
-                            <div class="student-absence-count">${item.totalAbsences} غیاب</div>
+                            <div class="student-absence-count">${item.totalAbsences} کاتژمێر · ${hoursToDays(item.totalAbsences)} ڕۆژ</div>
                         </div>
                         <div class="student-absence-details">
                             <div><strong>کۆد:</strong> ${student.code}</div>
@@ -1555,7 +1615,8 @@ let currentUser = null;
                 'پەیمانگە': item.student.institute,
                 'ئاست': item.student.level,
                 'گروپ': item.student.group,
-                'کۆی غیابات': item.totalAbsences,
+                'ژمارەی کاتژمێر': item.totalAbsences,
+                'ژمارەی ڕۆژ': hoursToDays(item.totalAbsences),
                 'بەروارەکانی غیابات': item.absenceDates.join(', ')
             }));
             
@@ -1573,60 +1634,62 @@ let currentUser = null;
                 showNotification('هەڵە', 'هیچ داتایەک نیە بۆ چاپکردن!', 'error');
                 return;
             }
-            
+
             const startDate = document.getElementById('studentAbsenceStartDate').value || 'نادیار';
             const endDate = document.getElementById('studentAbsenceEndDate').value || 'نادیار';
-            const totalStudents = document.getElementById('totalStudentsFound').textContent;
-            const totalAbsences = document.getElementById('totalAbsencesFound').textContent;
-            const averageAbsences = document.getElementById('averageAbsences').textContent;
-            
+            const esc = v => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            const n = studentAbsenceData.length;
+            const totalHours = studentAbsenceData.reduce((sum, i) => sum + i.totalAbsences, 0);
+            const totalDays = studentAbsenceData.reduce((sum, i) => sum + hoursToDays(i.totalAbsences), 0);
+
+            // قەبارەی ڕیزەکان بەپێی ژمارەی خوێندکاران، بۆ ئەوەی هەموو لە یەک پەڕەدا بن
+            const rowMm = Math.max(3.6, Math.min(8, 246 / (n + 1)));
+            const fs = Math.max(8, Math.min(13, Math.round(rowMm * 3.78 * 0.5)));
+
             let printContent = `
-                <div class="print-header">
-                    <div class="print-title">کۆی غیاباتی خوێندکاران</div>
-                    <div class="print-date">لە ${startDate} تا ${endDate}</div>
-                    <div class="print-date">کاتی چاپ: ${new Date().toLocaleString('en-GB')}</div>
+                <style>
+                    @page { size: A4; margin: 8mm; }
+                    body { margin: 0 !important; padding: 0 !important; line-height: 1.2 !important; }
+                    .ap-head { text-align: center; border-bottom: 2px solid #00bfff; padding-bottom: 4px; margin-bottom: 6px; }
+                    .ap-title { font-size: 17px; font-weight: bold; color: #00bfff; }
+                    .ap-sub { font-size: 11px; color: #555; margin-top: 2px; }
+                    .ap-table { width: 100%; border-collapse: collapse; margin: 0 !important; }
+                    .ap-table th, .ap-table td { border: 1px solid #ccc; padding: 0 4px !important; text-align: center; height: ${rowMm}mm; font-size: ${fs}px; line-height: 1.1; }
+                    .ap-table th { background: #00bfff; color: #fff; }
+                    .ap-table tr { page-break-inside: avoid; }
+                    .ap-table td.nm { text-align: right; }
+                </style>
+                <div class="ap-head">
+                    <div class="ap-title">کۆی غیاباتی خوێندکاران</div>
+                    <div class="ap-sub">لە ${startDate} تا ${endDate} &nbsp;|&nbsp; خوێندکار: ${n} &nbsp;|&nbsp; کۆی کاتژمێر: ${totalHours} &nbsp;|&nbsp; کۆی ڕۆژ: ${totalDays} &nbsp;|&nbsp; ${new Date().toLocaleString('en-GB')}</div>
                 </div>
-                
-                <div class="attendance-details-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0;">
-                    <div class="detail-stat-card" style="text-align: center; padding: 15px; border-radius: 8px; border: 2px solid #17a2b8;">
-                        <div class="detail-stat-number" style="font-size: 28px; font-weight: bold; color: #17a2b8;">${totalStudents}</div>
-                        <div>کۆی خوێندکارەکان</div>
-                    </div>
-                    <div class="detail-stat-card" style="text-align: center; padding: 15px; border-radius: 8px; border: 2px solid #dc3545;">
-                        <div class="detail-stat-number" style="font-size: 28px; font-weight: bold; color: #dc3545;">${totalAbsences}</div>
-                        <div>کۆی غیابات</div>
-                    </div>
-                    <div class="detail-stat-card" style="text-align: center; padding: 15px; border-radius: 8px; border: 2px solid #28a745;">
-                        <div class="detail-stat-number" style="font-size: 28px; font-weight: bold; color: #28a745;">${averageAbsences}</div>
-                        <div>تێکڕای غیابات</div>
-                    </div>
-                </div>
-                
-                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                <thead><tr style="background: #00bfff; color: white;">
-                    <th style="border: 1px solid #ddd; padding: 10px;">ناوی خوێندکار</th>
-                    <th style="border: 1px solid #ddd; padding: 10px;">کۆد</th>
-                    <th style="border: 1px solid #ddd; padding: 10px;">پەیمانگە</th>
-                    <th style="border: 1px solid #ddd; padding: 10px;">ئاست</th>
-                    <th style="border: 1px solid #ddd; padding: 10px;">گرووپ</th>
-                    <th style="border: 1px solid #ddd; padding: 10px;">کۆی غیابات</th>
+                <table class="ap-table">
+                <thead><tr>
+                    <th style="width:5%">#</th>
+                    <th>ناوی خوێندکار</th>
+                    <th style="width:8%">کۆد</th>
+                    <th style="width:7%">ئاست</th>
+                    <th style="width:10%">گرووپ</th>
+                    <th style="width:10%">کاتژمێر</th>
+                    <th style="width:8%">ڕۆژ</th>
                 </tr></thead><tbody>`;
-            
-            studentAbsenceData.forEach(item => {
+
+            studentAbsenceData.forEach((item, idx) => {
                 printContent += `
                     <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.student.name}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.student.code}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.student.institute}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.student.level}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.student.group}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: bold; color: #dc3545;">${item.totalAbsences}</td>
-                    </tr>
-                `;
+                        <td>${idx + 1}</td>
+                        <td class="nm">${esc(item.student.name)}</td>
+                        <td>${esc(item.student.code)}</td>
+                        <td>${esc(item.student.level)}</td>
+                        <td>${esc(item.student.group)}</td>
+                        <td style="font-weight:bold; color:#dc3545;">${item.totalAbsences}</td>
+                        <td style="font-weight:bold;">${hoursToDays(item.totalAbsences)}</td>
+                    </tr>`;
             });
-            
+
             printContent += '</tbody></table>';
-            
+
             improvedPrint(printContent, "کۆی غیاباتی خوێندکاران");
         }
 
@@ -2545,17 +2608,26 @@ let currentUser = null;
                             
                             console.log('👥 خوێندکارانی ئەم گرووپە:', groupStudents.length);
                             
+                            // ژمارەی چەند خوێندکار هەمان کۆدیان هەیە لەم گروپەدا
+                            const codeOccurrences2 = {};
+                            groupStudents.forEach(s => { codeOccurrences2[s.code] = (codeOccurrences2[s.code] || 0) + 1; });
+                            
                             groupStudents.forEach(student => {
-                                const studentKey = student.code || student.id;
+                                // ناسنامەی یەکتای خوێندکار (id) بۆ ژمێردنی وەکو یەک، نەک بەپێی کۆد کە لەوانەیە دووبارە بێت
+                                const uniqueKey = student.id || student.code;
                                 // ئەگەر لە داتابەیس نەبوو = ئامادەیە (چونکە تەنها غیابەکان خەزن دەکرێن)
-                                const isAbsent = attendance && attendance[studentKey] === 'absent';
+                                // یەکەم گەڕان بەپێی id (نوێ)، پاشان بەپێی کۆد - تەنها ئەگەر کۆدەکە یەکتا بێت
+                                const isAbsent = attendance && (
+                                    attendance[student.id] === 'absent' ||
+                                    (attendance[student.id] === undefined && codeOccurrences2[student.code] === 1 && attendance[student.code] === 'absent')
+                                );
                                 
                                 if (isAbsent) {
                                     absent++;
-                                    uniqueAbsentStudents.add(studentKey);
+                                    uniqueAbsentStudents.add(uniqueKey);
                                 } else {
                                     present++;
-                                    uniquePresentStudents.add(studentKey);
+                                    uniquePresentStudents.add(uniqueKey);
                                 }
                             });
                             
@@ -2649,11 +2721,22 @@ let currentUser = null;
     let presentStudents = [];
     let absentStudents = [];
     
+    // ژمارەی چەند خوێندکار هەمان کۆدیان هەیە لەم گروپەدا
+    const codeOccurrences3 = {};
+    groupStudents.forEach(s => { codeOccurrences3[s.code] = (codeOccurrences3[s.code] || 0) + 1; });
+    
     groupStudents.forEach(student => {
-        const studentKey = student.code || student.id;
-        const status = record.attendanceData[studentKey];
+        // یەکەم گەڕان بەپێی id (یەکتایە)، پاشان بەپێی کۆد - تەنها ئەگەر کۆدەکە یەکتا بێت لەم گروپەدا
+        let status = 'present';
+        if (record.attendanceData[student.id] === 'absent') {
+            status = 'absent';
+        } else if (record.attendanceData[student.id] === undefined &&
+                   codeOccurrences3[student.code] === 1 &&
+                   record.attendanceData[student.code] === 'absent') {
+            status = 'absent';
+        }
         
-        console.log(`   خوێندکار: ${student.name}, کۆد: ${studentKey}, status: ${status}`);
+        console.log(`   خوێندکار: ${student.name}, کۆد: ${student.code}, id: ${student.id}, status: ${status}`);
         
         if (status === 'absent') {
             absentStudents.push(student);
@@ -2987,14 +3070,17 @@ let currentUser = null;
                                 Object.keys(timeData).forEach(teacher => {
                                     const attendance = timeData[teacher];
                                     
-                                    // پشکنین بە کۆد + ئاست + گروپ بۆ چارەسەری کێشەی دوبارەبوونی کۆد
+                                    // یەکەم گەڕان بەپێی id (یەکتایە)، پاشان بەپێی کۆد + ئاست + گروپ بۆ داتای کۆن
                                     Object.keys(attendance).forEach(studentKey => {
                                         if (attendance[studentKey] === 'absent') {
-                                            const student = allStudents.find(s => 
-                                                (s.code === studentKey || s.id === studentKey) &&
-                                                String(s.level) === String(currentLevel) &&
-                                                String(s.group).toUpperCase() === String(currentGroup).toUpperCase()
-                                            );
+                                            let student = allStudents.find(s => String(s.id) === String(studentKey));
+                                            if (!student) {
+                                                student = allStudents.find(s => 
+                                                    s.code === studentKey &&
+                                                    String(s.level) === String(currentLevel) &&
+                                                    String(s.group).toUpperCase() === String(currentGroup).toUpperCase()
+                                                );
+                                            }
                                             if (student) {
                                                 detailedRecords.push({
                                                     studentName: student.name,
@@ -3198,21 +3284,25 @@ let currentUser = null;
                             timeSlots[time].subjects.add(subject);
                             timeSlots[time].teachers.add(teacher);
                             
-                            // پشکنین بە کۆد + ئاست + گروپ بۆ چارەسەری کێشەی دوبارەبوونی کۆد
+                            // یەکەم گەڕان بەپێی id (یەکتایە)، پاشان بەپێی کۆد + ئاست + گروپ بۆ داتای کۆن
                             if (attendance) {
                                 Object.keys(attendance).forEach(studentKey => {
                                     if (attendance[studentKey] === 'absent') {
-                                        const student = allStudents.find(s => 
-                                            (s.code === studentKey || s.id === studentKey) &&
-                                            String(s.level) === String(currentLevel) &&
-                                            String(s.group).toUpperCase() === String(currentGroup).toUpperCase()
-                                        );
+                                        let student = allStudents.find(s => String(s.id) === String(studentKey));
+                                        if (!student) {
+                                            student = allStudents.find(s => 
+                                                s.code === studentKey &&
+                                                String(s.level) === String(currentLevel) &&
+                                                String(s.group).toUpperCase() === String(currentGroup).toUpperCase()
+                                            );
+                                        }
                                         if (student) {
                                             const alreadyExists = timeSlots[time].absentStudents.some(
-                                                s => s.code === student.code && s.level === student.level
+                                                s => s.id === student.id
                                             );
                                             if (!alreadyExists) {
                                                 timeSlots[time].absentStudents.push({
+                                                    id: student.id,
                                                     name: student.name,
                                                     code: student.code,
                                                     group: student.group,
