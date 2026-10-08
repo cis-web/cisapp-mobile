@@ -22,6 +22,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>ئەم ئەپە کامێرا بەکاردەهێنێت بۆ سکانی بارکۆدی چوونەژوورەوە و وێنەگرتن.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ئەم ئەپە دەستگەیشتن بە وێنەکانت پێویستە بۆ هەڵبژاردنی وێنە.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>ئەم ئەپە شوێنی ئامێرەکەت بەکاردەهێنێت بۆ باشترکردنی ئەزموونی بەکارهێنان.</string>
 	<key>NSFaceIDUsageDescription</key>
