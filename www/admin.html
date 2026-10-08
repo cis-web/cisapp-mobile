@@ -1636,7 +1636,32 @@ body {
         size: A4 portrait !important;
     }
 }
-    </style>
+    
+/* ===== سلایدەری ئاگاداری: دوگمە و خشتە ===== */
+.hs-actions { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+.hs-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; border:none; border-radius:10px; padding:9px 14px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; color:#fff; }
+.hs-toggle { background:#64748b; }
+.hs-edit { background:#f59e0b; color:#1e293b; }
+.hs-del { background:#ef4444; }
+.hs-btn:active { transform:scale(.97); opacity:.9; }
+.developer-info { font-size:17px !important; font-weight:700; line-height:2; color:#475569 !important; padding:20px 12px 8px; }
+@media (max-width: 768px) {
+    .hs-table, .hs-table tbody, .hs-table tr, .hs-table td { display:block; width:100%; }
+    .hs-table thead { display:none; }
+    .hs-table { border:none; min-width:0 !important; }
+    .hs-table tr { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:12px 14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(15,23,42,.06); }
+    .hs-table td { border:none !important; padding:6px 0 !important; text-align:right; max-width:none !important; display:flex; justify-content:space-between; gap:12px; align-items:flex-start; word-break:break-word; }
+    .hs-table td[data-label]::before { content:attr(data-label); color:#94a3b8; font-size:12px; font-weight:700; flex:0 0 auto; }
+    .hs-table td.hs-t { font-size:16px; font-weight:800; color:#1e293b; }
+    .hs-table td.hs-m { display:block; font-size:14px; line-height:1.9; color:#475569; }
+    .hs-table td.hs-m::before { display:block; margin-bottom:2px; }
+    .hs-table td.hs-actions-cell { display:block; padding-top:10px !important; margin-top:6px; border-top:1px solid #f1f5f9 !important; }
+    .hs-actions { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .hs-btn { padding:11px 4px; font-size:12.5px; flex-direction:column; gap:4px; }
+    .hs-btn i { font-size:16px; }
+    #homeSlidesSection .add-btn { width:100%; justify-content:center; padding:14px; font-size:15px; white-space:normal; }
+}
+</style>
 </head>
 <body>
     <!-- Login Page -->
@@ -1764,7 +1789,11 @@ body {
                 <span id="unreadStudentMsgBadgeHeader" class="notification-badge" style="display: none;">0</span>
             </button>
 
-            <button class="notification-bell" style="left: 305px;" onclick="openAccountSettingsModal()" title="گۆڕینی ئیمەیڵ و پاسوۆرد">
+            <button class="notification-bell" style="left: 305px;" onclick="switchSection('homeSlides')" title="سلایدەری ئاگاداری داشبۆرد">
+                <i class="fas fa-images"></i>
+            </button>
+
+            <button class="notification-bell" style="left: 360px; display:none;" onclick="openAccountSettingsModal()" title="گۆڕینی ئیمەیڵ و پاسوۆرد">
                 <i class="fas fa-cog"></i>
             </button>
             </div>
@@ -1862,6 +1891,9 @@ body {
                         </button>
                         <button class="section-btn" onclick="switchSection('announcements')">
                             <i class="fas fa-bell"></i> ئاگاداریەکان
+                        </button>
+                        <button class="section-btn" onclick="switchSection('homeSlides')">
+                            <i class="fas fa-images"></i> سلایدەری داشبۆردی سەرەکی
                         </button>
                         <button class="section-btn" onclick="switchSection('guardians')">
                             <i class="fas fa-user-friends"></i> بەخێوکاران
@@ -2151,7 +2183,7 @@ body {
                     </button>
                 </div>
                 <div style="overflow-x: auto;">
-                    <table class="schedule-table">
+                    <table class="schedule-table hs-table">
                         <thead>
                             <tr>
                                 <th>سەردێڕ</th>
@@ -2164,6 +2196,33 @@ body {
                         <tbody id="announcementsTableBody">
                             <!-- Data will be loaded here -->
                         </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Home Slides Section (سلایدەری ئاگاداری لە داشبۆردی سەرەکی) -->
+            <div id="homeSlidesSection" style="display: none;">
+                <div class="search-container">
+                    <button class="add-btn" onclick="openHomeSlideModal()">
+                        <i class="fas fa-plus"></i> زیادکردنی ئاگاداری بۆ سلایدەر
+                    </button>
+                </div>
+                <p style="font-size:13px; color:#64748b; margin:8px 4px 12px; line-height:1.8;">
+                    ئەم ئاگاداریانە لە داشبۆردی سەرەکی ئەپەکە وەک سلایدەر بۆ هەموو خوێندکار، مامۆستا، فەرمانبەر و بەخێوکار پیشان دەدرێن.
+                </p>
+                <div style="overflow-x: auto;">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>سەردێڕ</th>
+                                <th>پەیام</th>
+                                <th>ڕەنگ</th>
+                                <th>کۆتایی</th>
+                                <th>دۆخ</th>
+                                <th>کردارەکان</th>
+                            </tr>
+                        </thead>
+                        <tbody id="homeSlidesTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -2469,8 +2528,11 @@ body {
                     </select>
                     <input type="date" id="sasStartDate" class="search-input" style="max-width:170px;" title="لە بەرواری">
                     <input type="date" id="sasEndDate" class="search-input" style="max-width:170px;" title="بۆ بەرواری">
-                    <button class="add-btn" style="background:var(--danger);" onclick="searchStudentAbsenceSummary()">
+                    <button class="add-btn" style="background:var(--danger);" onclick="sasView='cards'; searchStudentAbsenceSummary()">
                         <i class="fas fa-search"></i> گەڕان
+                    </button>
+                    <button class="add-btn" style="background:var(--primary-dark, #008ab8);" onclick="sasView='hours'; searchStudentAbsenceSummary()">
+                        <i class="fas fa-clock"></i> کاتژمێر و ڕۆژی غیاب
                     </button>
                     <button class="export-btn" style="background:#059669;" onclick="exportStudentAbsenceSummary()">
                         <i class="fas fa-file-excel"></i> هەناردە
@@ -2915,6 +2977,64 @@ body {
 
                 <button type="submit" class="submit-btn">
                     <i class="fas fa-save"></i> پاشەکەوتکردن
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Home Slide Modal -->
+    <div id="homeSlideModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="homeSlideModalTitle"><i class="fas fa-images"></i> ئاگاداری نوێ بۆ سلایدەر</h3>
+                <button class="close-btn" onclick="closeHomeSlideModal()">&times;</button>
+            </div>
+
+            <form onsubmit="saveHomeSlide(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> سەردێڕ</label>
+                    <input type="text" id="hsTitle" maxlength="80" placeholder="نموونە: پشوودان بۆ سبەینێ" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-align-right"></i> پەیام</label>
+                    <textarea id="hsMessage" rows="4" maxlength="500" placeholder="ناوەڕۆکی ئاگاداریەکە بنووسە..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-palette"></i> ڕەنگ</label>
+                    <select id="hsTheme">
+                        <option value="blue">شین</option>
+                        <option value="green">سەوز</option>
+                        <option value="orange">پرتەقاڵی</option>
+                        <option value="red">سوور (گرنگ)</option>
+                        <option value="purple">مۆر</option>
+                        <option value="teal">تیڵ</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-times"></i> بەرواری کۆتایی (ئارەزوومەندانە)</label>
+                    <input type="date" id="hsExpires">
+                    <small style="color:#64748b; display:block; margin-top:4px;">دوای ئەم بەروارە ئاگاداریەکە خۆکارانە لە سلایدەر نامێنێت. بەتاڵ = بەردەوام.</small>
+                </div>
+
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        <input type="checkbox" id="hsActive" checked style="width:auto;"> پیشاندان لە سلایدەر
+                    </label>
+                </div>
+
+                <div class="form-group" id="hsPushGroup">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        <input type="checkbox" id="hsPush" style="width:auto;"> ناردنی ئاگادارکردنەوەی مۆبایل بۆ هەموو بەکارهێنەران
+                    </label>
+                </div>
+
+                <input type="hidden" id="hsEditId">
+
+                <button type="submit" class="submit-btn" id="hsSaveBtn">
+                    <i class="fas fa-save"></i> بڵاوکردنەوە
                 </button>
             </form>
         </div>
@@ -4638,6 +4758,135 @@ body {
             }
         }
 
+        // ==================== Home Slides (سلایدەری داشبۆردی سەرەکی) ====================
+        let homeSlideRecords = [];
+        let homeSlidesListening = false;
+        const HS_THEME_NAMES = { blue: 'شین', green: 'سەوز', orange: 'پرتەقاڵی', red: 'سوور', purple: 'مۆر', teal: 'تیڵ' };
+
+        function hsEsc(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function loadHomeSlides() {
+            if (homeSlidesListening) { renderHomeSlides(); return; }
+            homeSlidesListening = true;
+            database.ref('homeSlides').on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                homeSlideRecords = Object.keys(data).map(k => ({ id: k, ...data[k] }));
+                homeSlideRecords.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+                renderHomeSlides();
+            }, (err) => {
+                homeSlidesListening = false;
+                alert('نەتوانرا ئاگاداریەکان بخوێندرێنەوە: ' + err.message);
+            });
+        }
+
+        function renderHomeSlides() {
+            const tbody = document.getElementById('homeSlidesTableBody');
+            if (!tbody) return;
+            if (homeSlideRecords.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">هیچ ئاگاداریەک لە سلایدەر نییە</td></tr>';
+                return;
+            }
+            const today = new Date().toISOString().slice(0, 10);
+            tbody.innerHTML = homeSlideRecords.map(item => {
+                const expired = item.expiresAt && item.expiresAt < today;
+                const status = expired ? 'بەسەرچووە' : (item.active === false ? 'شاراوە' : 'پیشان دەدرێت');
+                const statusColor = expired ? '#ef4444' : (item.active === false ? '#94a3b8' : '#10b981');
+                return `<tr>
+                    <td data-label="سەردێڕ" class="hs-t">${hsEsc(item.title)}</td>
+                    <td data-label="پەیام" class="hs-m">${hsEsc(item.message)}</td>
+                    <td data-label="ڕەنگ">${HS_THEME_NAMES[item.theme] || 'شین'}</td>
+                    <td data-label="کۆتایی">${item.expiresAt ? hsEsc(item.expiresAt) : '—'}</td>
+                    <td data-label="دۆخ" style="color:${statusColor}; font-weight:700;">${status}</td>
+                    <td class="hs-actions-cell">
+                        <div class="hs-actions">
+                            <button class="hs-btn hs-toggle" onclick="toggleHomeSlide('${item.id}')"><i class="fas ${item.active === false ? 'fa-eye' : 'fa-eye-slash'}"></i> ${item.active === false ? 'پیشاندان' : 'شاردنەوە'}</button>
+                            <button class="hs-btn hs-edit" onclick="editHomeSlide('${item.id}')"><i class="fas fa-edit"></i> دەستکاری</button>
+                            <button class="hs-btn hs-del" onclick="deleteHomeSlide('${item.id}')"><i class="fas fa-trash"></i> سڕینەوە</button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function openHomeSlideModal() {
+            document.getElementById('homeSlideModalTitle').innerHTML = '<i class="fas fa-images"></i> ئاگاداری نوێ بۆ سلایدەر';
+            document.getElementById('hsEditId').value = '';
+            document.getElementById('hsTitle').value = '';
+            document.getElementById('hsMessage').value = '';
+            document.getElementById('hsTheme').value = 'blue';
+            document.getElementById('hsExpires').value = '';
+            document.getElementById('hsActive').checked = true;
+            document.getElementById('hsPush').checked = false;
+            document.getElementById('hsPushGroup').style.display = 'block';
+            document.getElementById('homeSlideModal').style.display = 'flex';
+        }
+
+        function closeHomeSlideModal() {
+            document.getElementById('homeSlideModal').style.display = 'none';
+        }
+
+        function editHomeSlide(id) {
+            const item = homeSlideRecords.find(a => a.id === id);
+            if (!item) return;
+            document.getElementById('homeSlideModalTitle').innerHTML = '<i class="fas fa-edit"></i> دەستکاریکردنی ئاگاداری';
+            document.getElementById('hsEditId').value = id;
+            document.getElementById('hsTitle').value = item.title || '';
+            document.getElementById('hsMessage').value = item.message || '';
+            document.getElementById('hsTheme').value = item.theme || 'blue';
+            document.getElementById('hsExpires').value = item.expiresAt || '';
+            document.getElementById('hsActive').checked = item.active !== false;
+            document.getElementById('hsPush').checked = false;
+            document.getElementById('hsPushGroup').style.display = 'none';
+            document.getElementById('homeSlideModal').style.display = 'flex';
+        }
+
+        async function saveHomeSlide(event) {
+            event.preventDefault();
+            const id = document.getElementById('hsEditId').value;
+            const title = document.getElementById('hsTitle').value.trim();
+            const message = document.getElementById('hsMessage').value.trim();
+            if (!title || !message) return;
+            const data = {
+                title: title,
+                message: message,
+                theme: document.getElementById('hsTheme').value,
+                expiresAt: document.getElementById('hsExpires').value || '',
+                active: document.getElementById('hsActive').checked
+            };
+            const btn = document.getElementById('hsSaveBtn');
+            btn.disabled = true;
+            try {
+                if (id) {
+                    await database.ref('homeSlides/' + id).update(data);
+                } else {
+                    data.date = new Date().toISOString();
+                    await database.ref('homeSlides').push(data);
+                    if (document.getElementById('hsPush').checked && typeof sendPushNotification === 'function') {
+                        sendPushNotification({ includeAll: true }, title, message);
+                    }
+                }
+                closeHomeSlideModal();
+            } catch (e) {
+                alert('پاشەکەوت نەکرا: ' + e.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function toggleHomeSlide(id) {
+            const item = homeSlideRecords.find(a => a.id === id);
+            if (!item) return;
+            database.ref('homeSlides/' + id).update({ active: item.active === false })
+                .catch(e => alert('نەگۆڕدرا: ' + e.message));
+        }
+
+        function deleteHomeSlide(id) {
+            if (!confirm('دڵنیای لە سڕینەوەی ئەم ئاگاداریە؟')) return;
+            database.ref('homeSlides/' + id).remove().catch(e => alert('نەسڕایەوە: ' + e.message));
+        }
+
         // ==================== Announcements ====================
         let announcementRecords = [];
 
@@ -5000,9 +5249,11 @@ body {
         let flatAttendanceRecords = [];
         let leaveRecordsAdmin = [];
 
-        function studentNameByCode(code) {
-            const s = allStudents.find(st => String(st.code) === String(code));
-            return s ? s.name : code;
+        function studentNameByCode(codeOrId) {
+            // یەکەم گەڕان بەپێی id (یەکتایە، داتای نوێ)، پاشان بەپێی کۆد (بۆ داتای کۆن)
+            const s = allStudents.find(st => String(st.id) === String(codeOrId)) ||
+                      allStudents.find(st => String(st.code) === String(codeOrId));
+            return s ? s.name : codeOrId;
         }
 
         function loadAttendanceRecords() {
@@ -6579,6 +6830,7 @@ body {
             document.getElementById('teacherPlansSection').style.display = 'none';
             document.getElementById('studentAbsenceSummarySection').style.display = 'none';
             document.getElementById('archiveSection').style.display = 'none';
+            document.getElementById('homeSlidesSection').style.display = 'none';
             document.getElementById('backToDashboardBtn').style.display = 'none';
             
             if (section === 'dashboard') {
@@ -6674,6 +6926,11 @@ body {
                 document.getElementById('sectionTitle').textContent = 'ئەرشیفی سەرکەوتووان';
                 document.getElementById('backToDashboardBtn').style.display = 'flex';
                 loadArchive();
+            } else if (section === 'homeSlides') {
+                document.getElementById('homeSlidesSection').style.display = 'block';
+                document.getElementById('sectionTitle').textContent = 'سلایدەری داشبۆردی سەرەکی';
+                document.getElementById('backToDashboardBtn').style.display = 'flex';
+                loadHomeSlides();
             }
         }
 
@@ -6697,9 +6954,9 @@ body {
 
         // ===== گرووپەکان بەپێی ئاست =====
         // ئاستی 1-3: A تا E (بنەڕەت A)
-        // ئاستی 4-5: PRO-A ، PRO-B ، WEB ، NET (تەنها پرۆگرام دوو لقی هەیە)
+        // ئاستی 4-5: PRO ، PRO-A ، PRO-B ، WEB ، NET
         const GROUPS_LOW = ['A', 'B', 'C', 'D', 'E'];
-        const GROUPS_HIGH = ['PRO-A', 'PRO-B', 'WEB', 'NET'];
+        const GROUPS_HIGH = ['PRO', 'PRO-A', 'PRO-B', 'WEB', 'NET'];
 
         function refreshStudentGroupOptions(keepValue) {
             const levelRaw = document.getElementById('studentLevel').value;
@@ -7681,6 +7938,60 @@ body {
             return { level, group };
         }
 
+        // ===== کاتژمێر و ڕۆژی غیاب =====
+        // هەر ٤ کاتژمێر غیاب = ١ ڕۆژ (دەتوانیت ئەم ژمارەیە بگۆڕیت)
+        const HOURS_PER_ABSENCE_DAY = 4;
+        let sasView = 'cards';
+
+        function sasHoursToDays(hours) {
+            return Math.floor(hours / HOURS_PER_ABSENCE_DAY);
+        }
+
+        function renderSasHoursTable() {
+            const resultsContainer = document.getElementById('sasResults');
+            const totalHours = studentAbsenceData.reduce((sum, i) => sum + i.totalAbsences, 0);
+            const totalDays = studentAbsenceData.reduce((sum, i) => sum + sasHoursToDays(i.totalAbsences), 0);
+
+            let rows = '';
+            studentAbsenceData.forEach((item, idx) => {
+                const hours = item.totalAbsences;
+                const days = sasHoursToDays(hours);
+                const rest = hours % HOURS_PER_ABSENCE_DAY;
+                const dayColor = days > 0 ? '#dc3545' : '#28a745';
+                rows += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td style="text-align:right; font-weight:600;">${escapeAdminPlan(item.student.name)}</td>
+                        <td>${item.student.code || ''}</td>
+                        <td><span style="color:#dc3545; font-weight:bold;">${hours}</span></td>
+                        <td>
+                            <span style="color:${dayColor}; font-weight:bold; font-size:16px;">${days}</span>
+                            ${rest > 0 && days > 0 ? `<div style="font-size:11px; color:var(--gray);">+ ${rest} کاتژمێر</div>` : ''}
+                        </td>
+                    </tr>`;
+            });
+
+            resultsContainer.style.display = 'block';
+            resultsContainer.innerHTML = `
+                <div style="text-align:center; margin:10px 0; color:var(--gray); font-size:13px;">
+                    هەر ${HOURS_PER_ABSENCE_DAY} کاتژمێر غیاب = 1 ڕۆژ غیاب | کۆی کاتژمێر: <b>${totalHours}</b> | کۆی ڕۆژ: <b>${totalDays}</b>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%; border-collapse:collapse; background:white; border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                        <thead>
+                            <tr style="background:var(--primary, #00bfff); color:#fff;">
+                                <th style="padding:12px;">#</th>
+                                <th style="padding:12px;">ناوی خوێندکار</th>
+                                <th style="padding:12px;">کۆد</th>
+                                <th style="padding:12px;">ژمارەی کاتژمێر</th>
+                                <th style="padding:12px;">ژمارەی ڕۆژ</th>
+                            </tr>
+                        </thead>
+                        <tbody style="text-align:center;">${rows}</tbody>
+                    </table>
+                </div>`;
+        }
+
         function initStudentAbsenceSummary() {
             const today = new Date();
             const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -7797,6 +8108,13 @@ body {
 
             studentAbsenceData.sort((a, b) => b.totalAbsences - a.totalAbsences);
 
+            if (sasView === 'hours') {
+                renderSasHoursTable();
+                showSuccess(`${totalStudentsCount} خوێندکار دۆزرایەوە`);
+                return;
+            }
+            resultsContainer.style.display = 'grid';
+
             let html = '';
             studentAbsenceData.forEach(item => {
                 const s = item.student;
@@ -7822,7 +8140,7 @@ body {
                     <div style="background:white; border-radius:12px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-right:4px solid ${countColor};">
                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
                             <div style="font-weight:700; font-size:16px; color:var(--dark);">${escapeAdminPlan(s.name)}</div>
-                            <div style="background:${countColor}; color:#fff; padding:3px 14px; border-radius:20px; font-size:13px; font-weight:700;">${item.totalAbsences} غیاب</div>
+                            <div style="background:${countColor}; color:#fff; padding:3px 14px; border-radius:20px; font-size:13px; font-weight:700;">${item.totalAbsences} کاتژمێر · ${sasHoursToDays(item.totalAbsences)} ڕۆژ</div>
                         </div>
                         <div style="display:flex; flex-wrap:wrap; gap:16px; font-size:13px; color:var(--gray);">
                             <div><strong>کۆد:</strong> ${s.code || ''}</div>
@@ -7845,7 +8163,8 @@ body {
                 'کۆد': item.student.code,
                 'ئاست': item.student.level,
                 'گروپ': item.student.group,
-                'کۆی غیابات': item.totalAbsences,
+                'ژمارەی کاتژمێر': item.totalAbsences,
+                'ژمارەی ڕۆژ': sasHoursToDays(item.totalAbsences),
                 'بەروارەکانی غیابات': item.absenceDates.join(', ')
             }));
             exportDataToExcel(data, `کۆی_غیاباتی_خوێندکاران_${startDate}_تا_${endDate}.xlsx`);
@@ -7855,19 +8174,26 @@ body {
             if (studentAbsenceData.length === 0) { alert('هیچ داتایەک نییە بۆ چاپکردن!'); return; }
             const startDate = document.getElementById('sasStartDate').value || 'نادیار';
             const endDate = document.getElementById('sasEndDate').value || 'نادیار';
-            const totalStudents = document.getElementById('sasTotalStudents').textContent;
-            const totalAbsences = document.getElementById('sasTotalAbsences').textContent;
-            const avg = document.getElementById('sasAvgAbsences').textContent;
+
+            const n = studentAbsenceData.length;
+            const totalHours = studentAbsenceData.reduce((sum, i) => sum + i.totalAbsences, 0);
+            const totalDays = studentAbsenceData.reduce((sum, i) => sum + sasHoursToDays(i.totalAbsences), 0);
+
+            // قەبارەی ڕیزەکان بەپێی ژمارەی خوێندکاران، بۆ ئەوەی هەموو لە یەک پەڕەدا بن
+            const rowMm = Math.max(3.6, Math.min(8, 246 / (n + 1)));
+            const fs = Math.max(8, Math.min(13, Math.round(rowMm * 3.78 * 0.5)));
 
             let rows = '';
-            studentAbsenceData.forEach(item => {
+            studentAbsenceData.forEach((item, idx) => {
                 rows += `
                     <tr>
-                        <td>${escapeAdminPlan(item.student.name)}</td>
+                        <td>${idx + 1}</td>
+                        <td class="nm">${escapeAdminPlan(item.student.name)}</td>
                         <td>${item.student.code || ''}</td>
                         <td>${item.student.level || ''}</td>
                         <td>${item.student.group || ''}</td>
                         <td style="font-weight:bold; color:#dc3545;">${item.totalAbsences}</td>
+                        <td style="font-weight:bold;">${sasHoursToDays(item.totalAbsences)}</td>
                     </tr>`;
             });
 
@@ -7876,39 +8202,34 @@ body {
                 <html lang="ku" dir="rtl">
                 <head>
                     <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>کۆی غیاباتی خوێندکاران</title>
                     <style>
                         @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic&display=swap');
+                        @page { size: A4; margin: 8mm; }
                         * { margin:0; padding:0; box-sizing:border-box; }
-                        body { font-family:'Noto Kufi Arabic','Segoe UI',Tahoma,Arial,sans-serif; direction:rtl; padding:20px; font-size:13px; color:#222; }
-                        .header { text-align:center; margin-bottom:16px; border-bottom:3px solid #00bfff; padding-bottom:12px; }
-                        .header h1 { font-size:20px; color:#00bfff; margin-bottom:6px; }
-                        .header p { color:#555; font-size:12px; }
-                        .stats { display:flex; gap:16px; justify-content:center; margin:16px 0; flex-wrap:wrap; }
-                        .stat { border:2px solid #00bfff; border-radius:8px; padding:8px 20px; text-align:center; min-width:120px; }
-                        .stat strong { display:block; font-size:22px; color:#00bfff; }
-                        .stat span { font-size:12px; color:#555; }
-                        table { width:100%; border-collapse:collapse; margin-top:10px; }
-                        th { background:#00bfff; color:#fff; padding:10px 8px; font-size:12px; }
-                        td { padding:8px; text-align:center; border-bottom:1px solid #e0e0e0; font-size:12px; }
-                        tr:nth-child(even) { background:#f8f9fa; }
-                        .footer { margin-top:18px; text-align:center; color:#888; font-size:11px; border-top:1px solid #eee; padding-top:10px; }
-                        @media print { @page { margin:1.5cm; size:A4; } }
+                        body { font-family:'Noto Kufi Arabic','Segoe UI',Tahoma,Arial,sans-serif; direction:rtl; padding:8px; color:#222; line-height:1.2; }
+                        .header { text-align:center; margin-bottom:6px; border-bottom:2px solid #00bfff; padding-bottom:4px; }
+                        .header h1 { font-size:17px; color:#00bfff; }
+                        .header p { color:#555; font-size:11px; margin-top:2px; }
+                        table { width:100%; border-collapse:collapse; }
+                        th { background:#00bfff; color:#fff; padding:0 4px; height:${rowMm}mm; font-size:${fs}px; border:1px solid #ccc; }
+                        td { padding:0 4px; height:${rowMm}mm; font-size:${fs}px; line-height:1.1; text-align:center; border:1px solid #ccc; }
+                        td.nm { text-align:right; }
+                        tr { page-break-inside:avoid; }
+                        .footer { margin-top:6px; text-align:center; color:#888; font-size:9px; }
+                        @media print { body { padding:0; } }
                     </style>
                 </head>
                 <body>
                     <div class="header">
-                        <h1>📊 کۆی غیاباتی خوێندکاران</h1>
-                        <p>پەیمانگەی کۆمپیوتەری سلێمانی</p>
-                        <p>لە ${startDate} تا ${endDate} &nbsp;|&nbsp; کاتی چاپ: ${new Date().toLocaleString('en-GB')}</p>
-                    </div>
-                    <div class="stats">
-                        <div class="stat"><strong>${totalStudents}</strong><span>کۆی خوێندکارەکان</span></div>
-                        <div class="stat"><strong>${totalAbsences}</strong><span>کۆی غیابات</span></div>
-                        <div class="stat"><strong>${avg}</strong><span>تێکڕای غیابات</span></div>
+                        <h1>کۆی غیاباتی خوێندکاران</h1>
+                        <p>پەیمانگەی کۆمپیوتەری سلێمانی &nbsp;|&nbsp; لە ${startDate} تا ${endDate} &nbsp;|&nbsp; خوێندکار: ${n} &nbsp;|&nbsp; کۆی کاتژمێر: ${totalHours} &nbsp;|&nbsp; کۆی ڕۆژ: ${totalDays} &nbsp;|&nbsp; ${new Date().toLocaleString('en-GB')}</p>
                     </div>
                     <table>
-                        <thead><tr><th>ناوی خوێندکار</th><th>کۆد</th><th>ئاست</th><th>گرووپ</th><th>کۆی غیابات</th></tr></thead>
+                        <thead><tr>
+                            <th style="width:5%">#</th><th>ناوی خوێندکار</th><th style="width:8%">کۆد</th><th style="width:7%">ئاست</th><th style="width:10%">گرووپ</th><th style="width:10%">کاتژمێر</th><th style="width:8%">ڕۆژ</th>
+                        </tr></thead>
                         <tbody>${rows}</tbody>
                     </table>
                     <div class="footer">ئەم ئەپە لەلایەن ماجدانوەر دروستکراوە</div>
@@ -7986,20 +8307,22 @@ body {
 
             auth.currentUser.reauthenticateWithCredential(credential)
                 .then(() => {
-                    const tasks = [];
-                    if (newEmail && newEmail !== currentUser.email) {
-                        tasks.push(auth.currentUser.updateEmail(newEmail));
-                    }
-                    if (newPassword) {
-                        tasks.push(auth.currentUser.updatePassword(newPassword));
-                    }
-                    return Promise.all(tasks);
+                    const changeEmail = newEmail && newEmail !== currentUser.email;
+                    // پاسوۆرد یەکەم دەگۆڕدرێت، پاشان ئیمەیڵ (Firebase داوای پشتڕاستکردنەوە دەکات)
+                    const passP = newPassword ? auth.currentUser.updatePassword(newPassword) : Promise.resolve();
+                    return passP.then(() => {
+                        if (changeEmail) return auth.currentUser.verifyBeforeUpdateEmail(newEmail).then(() => 'emailSent');
+                        return 'done';
+                    }).then(r => ({ r, newPassword: !!newPassword }));
                 })
-                .then(() => {
-                    if (newEmail && newEmail !== currentUser.email) {
-                        currentUser.email = newEmail;
+                .then((res) => {
+                    let text;
+                    if (res.r === 'emailSent') {
+                        text = (res.newPassword ? 'پاسوۆرد گۆڕدرا. ' : '') + 'لینکی پشتڕاستکردنەوە نێردرا بۆ ' + newEmail + ' — دوای کرتەکردن لەسەر لینکەکە ئیمەیڵەکە دەگۆڕدرێت. تا ئەوکات بە ئیمەیڵی کۆن بچۆرەژوورەوە.';
+                    } else {
+                        text = 'پاسوۆرد بەسەرکەوتوویی گۆڕدرا.';
                     }
-                    showAccountSettingsMsg('بەسەرکەوتوویی نوێکرایەوە. ئەگەر ئیمەیڵت گۆڕی، جاری داهاتوو بەو ئیمەیڵە نوێیە بچۆرەژوورەوە.', false);
+                    showAccountSettingsMsg(text, false);
                     document.getElementById('currentPasswordInput').value = '';
                     document.getElementById('newPasswordInput').value = '';
                     document.getElementById('confirmNewPasswordInput').value = '';
@@ -8023,6 +8346,11 @@ body {
                     submitBtn.innerHTML = '<i class="fas fa-save"></i> پاشەکەوتکردن';
                 });
         }
+
+        // Hidden shortcut: Ctrl+Shift+K opens account settings
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'K' || e.key === 'k')) { e.preventDefault(); openAccountSettingsModal(); }
+        });
 
         // Logout
         function logout() {
