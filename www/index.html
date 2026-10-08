@@ -1,503 +1,946 @@
 <!DOCTYPE html>
-<html lang="ku" dir="rtl">
+<html lang="ckb" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="color-scheme" content="light only">
-    <meta name="supported-color-schemes" content="light">
-    <title>سیستەمی پەیمانگەی کۆمپیوتەری سلێمانی</title>
-    
- <link rel="icon" type="image/jpeg" href="logo-cis.jpg">
-
-<link rel="apple-touch-icon" href="logo-cis.jpg">
-
-<link rel="apple-touch-icon" sizes="180x180" href="logo-cis.jpg">
-
-<link rel="apple-touch-icon" sizes="152x152" href="logo-cis.jpg">
-
-<link rel="apple-touch-icon" sizes="120x120" href="logo-cis.jpg">
-    
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="CIS Sulaimany">
-    
-    <meta name="theme-color" content="#00bfff">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="description" content="سیستەمی بەڕێوەبردنی پەیمانگەی کۆمپیوتەری سلێمانی">
-    
-    <link rel="stylesheet" href="fa/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستەمی بەڕێوەبردنی مەلەوانگە - QR & Barcode</title>
+    <!-- JsBarcode & QRCode CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-:root {
-    color-scheme: light;
-    --primary:#00bfff; --primary-dark:#008ab8;
-    --white:#fff; --light-bg:#f1f5f9; --text-dark:#1e293b; --text-gray:#64748b; --border:#e2e8f0;
-}
-html, body { height:100%; }
-body {
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-    background:var(--light-bg); direction:rtl; line-height:1.5; color:var(--text-dark);
-    overflow:hidden;
-}
-.app { height:100vh; height:100dvh; max-width:760px; margin:0 auto; display:flex; flex-direction:column; background:var(--light-bg); position:relative; }
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+        }
 
-/* ---------- top bar ---------- */
-.top { background:#ffffff; padding:calc(max(env(safe-area-inset-top,0px), var(--status-min,0px)) + 12px) 14px 46px; border-radius:0 0 26px 26px; box-shadow:0 4px 16px rgba(15,23,42,.12); }
-.top-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-.mobile-menu-btn, .mobile-user {
-    width:40px; height:40px; border-radius:50%; border:none; flex:0 0 40px;
-    background:#e2e8f0; color:#475569; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
-}
-.mobile-menu-btn:active, .mobile-user:active { background:#cbd5e1; }
-.top-spacer { width:40px; height:40px; flex:0 0 40px; }
-/* hidden admin trigger: invisible but still tappable */
-.mobile-user, .mobile-user:active { background:transparent !important; color:transparent; -webkit-tap-highlight-color:transparent; }
-.brand { display:flex; flex-direction:column; align-items:center; gap:7px; min-width:0; flex:1; justify-content:center; text-align:center; }
-.institute-logo { width:62px; height:62px; border-radius:50%; object-fit:contain; background:#ffffff !important; padding:5px; border:3px solid #475569; box-shadow:0 4px 14px rgba(15,23,42,.18); flex:0 0 auto; }
-.brand-tx { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; color:#475569; text-shadow:none; }
-.brand-tx b { font-size:16px; font-weight:800; line-height:1.35; }
-.brand-tx span { font-size:11.5px; opacity:1; color:#64748b; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-/* ---------- announcement slider ---------- */
-.hs-wrap { margin:-28px 12px 0; position:relative; z-index:2; flex:0 0 auto; }
-.hs-box { position:relative; overflow:hidden; border-radius:18px; box-shadow:0 8px 22px rgba(15,23,42,.18); touch-action:pan-y; user-select:none; -webkit-user-select:none; }
-.hs-track { display:flex; transition:transform .45s ease; will-change:transform; }
-.hs-slide { flex:0 0 100%; height:104px; display:flex; align-items:center; gap:12px; padding:12px 14px 18px; color:#fff; cursor:pointer; }
-.hs-ic { flex:0 0 46px; width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,.22); border:2px solid rgba(255,255,255,.55); display:flex; align-items:center; justify-content:center; font-size:20px; }
-.hs-tx { min-width:0; flex:1; }
-.hs-meta { font-size:10.5px; opacity:.85; margin-bottom:1px; }
-.hs-title { font-size:14.5px; font-weight:800; line-height:1.35; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
-.hs-msg { font-size:12px; opacity:.95; line-height:1.45; margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.hs-dots { position:absolute; bottom:6px; left:0; right:0; display:flex; justify-content:center; gap:5px; pointer-events:none; }
-.hs-dots span { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.5); transition:all .25s; }
-.hs-dots span.on { width:16px; border-radius:4px; background:#fff; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            direction: rtl;
+            padding-bottom: 50px;
+        }
 
-/* slide detail popup */
-.hs-modal { position:fixed; inset:0; background:rgba(15,23,42,.6); z-index:99998; display:none; align-items:center; justify-content:center; padding:16px; }
-.hs-modal.open { display:flex; }
-.hs-card { background:#fff; border-radius:20px; width:100%; max-width:380px; max-height:80vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,.3); }
-.hs-card-top { color:#fff; padding:18px 18px 14px; }
-.hs-card-top small { opacity:.85; font-size:11px; }
-.hs-card-top h3 { font-size:17px; font-weight:800; margin-top:2px; line-height:1.4; }
-.hs-card-body { padding:16px 18px; overflow-y:auto; font-size:14px; line-height:1.9; color:#334155; white-space:pre-wrap; }
-.hs-card button { margin:0 18px 16px; border:none; border-radius:12px; padding:12px; font-size:14px; font-weight:700; font-family:inherit; background:#f1f5f9; color:#475569; cursor:pointer; }
+        header {
+            background: linear-gradient(135deg, #0284c7, #0f172a);
+            color: white;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
 
-/* ---------- cards: everything fits one screen ---------- */
-.content-wrapper { flex:1; min-height:0; display:flex; flex-direction:column; padding:12px 12px 0; }
-.main-menu-cards { flex:1; min-height:0; display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(4,minmax(0,1fr)); gap:10px; }
-.menu-card-container { position:relative; min-height:0; height:100%; }
-.menu-card {
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(4px,1.1vh,10px);
-    width:100%; height:100%; min-height:0; padding:6px; background:#fff; border:none; border-radius:18px;
-    box-shadow:0 4px 14px rgba(15,23,42,.07); color:var(--text-dark); text-decoration:none; font-family:inherit; cursor:pointer;
-    transition:transform .15s ease, box-shadow .15s ease;
-}
-.menu-card:active { transform:scale(.97); box-shadow:0 2px 8px rgba(15,23,42,.08); }
-.menu-card-icon {
-    width:clamp(34px,6.4vh,52px); height:clamp(34px,6.4vh,52px); border-radius:50%;
-    background:linear-gradient(135deg,#64748b,#475569); color:#fff;
-    display:flex; align-items:center; justify-content:center; font-size:clamp(15px,2.8vh,22px); box-shadow:0 4px 10px rgba(0,0,0,.14);
-}
-.menu-card span { font-size:clamp(11px,1.7vh,13.5px); font-weight:700; text-align:center; line-height:1.3; }
-.c-teacher{--g1:#00bfff;--g2:#0284c7} .c-employee{--g1:#8b5cf6;--g2:#6d28d9} .c-student{--g1:#10b981;--g2:#047857} .c-guardian{--g1:#f59e0b;--g2:#d97706}
-.c-systems{--g1:#6366f1;--g2:#4338ca} .c-staff{--g1:#14b8a6;--g2:#0f766e} .c-archive{--g1:#eab308;--g2:#ca8a04} .c-about{--g1:#64748b;--g2:#475569}
+        header h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
 
-.footer { flex:0 0 auto; text-align:center; padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px)); color:#94a3b8; font-size:10px; line-height:1.5; }
-.footer strong { color:var(--primary-dark); font-size:10.5px; }
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
 
-/* ---------- dropdowns (unchanged behaviour) ---------- */
-.dropdown-menu { position:fixed; top:0; left:0; right:auto; background:#fff; border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,.2); display:none; z-index:1000; overflow:hidden; min-width:240px; max-width:calc(100vw - 24px); }
-.dropdown-menu.active { display:block; animation:slideDown .25s ease; }
-@keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-.dropdown-item { padding:14px 20px; display:flex; align-items:center; gap:14px; color:var(--text-dark); text-decoration:none; border-bottom:1px solid var(--border); font-size:14px; font-weight:500; }
-.dropdown-item:last-child { border-bottom:none; }
-.dropdown-item:active { background:#f0f7ff; }
-.dropdown-item i { color:var(--primary); width:20px; text-align:center; font-size:16px; }
+        .container {
+            max-width: 1100px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
 
-.nav-loading-overlay { position:fixed; inset:0; background:rgba(255,255,255,.85); display:flex; align-items:center; justify-content:center; z-index:99999; opacity:0; pointer-events:none; transition:opacity .15s ease; }
-.nav-loading-overlay.active { opacity:1; pointer-events:all; }
-.nav-loading-spinner { width:46px; height:46px; border:4px solid rgba(0,136,204,.2); border-top-color:var(--primary,#0088cc); border-radius:50%; animation:nav-spin .7s linear infinite; }
-@keyframes nav-spin { to { transform:rotate(360deg); } }
+        /* Nav Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            overflow-x: auto;
+        }
 
-/* phones: leave room under the Android/iOS status bar (change 26px if needed) */
-@media (max-width:700px) { :root { --status-min:26px; } .top-row { align-items:flex-start; } }
+        .tab-btn {
+            padding: 12px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
 
-/* ---------- wide screens: 4 x 2 ---------- */
-@media (min-width:700px) {
-    .main-menu-cards { grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,minmax(0,1fr)); }
-    .hs-slide { height:124px; }
-}
-/* very short screens: allow scrolling instead of squeezing */
-@media (max-height:540px) {
-    body { overflow:auto; }
-    .app { height:auto; min-height:100vh; }
-    .main-menu-cards { grid-template-rows:none; grid-auto-rows:96px; }
-}
-</style>
+        .tab-btn:hover {
+            background: #e0f2fe;
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Sections */
+        .tab-content {
+            display: none;
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Controls */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        input, select {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+        .btn-success:hover {
+            background: #15803d;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-expired {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Scan Box */
+        .scan-container {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .scan-input-box {
+            background: #f0f9ff;
+            border: 2px dashed var(--primary);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .scan-input-box input {
+            width: 100%;
+            max-width: 360px;
+            font-size: 20px;
+            text-align: center;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        /* Result Card */
+        .member-result-card {
+            display: none;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            background: #fff;
+            margin-top: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .result-item span {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .result-item strong {
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        /* Printable ID Card */
+        .card-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .card-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .member-card-preview {
+            border: 2px solid #0284c7;
+            border-radius: 12px;
+            padding: 16px;
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+            margin: 16px 0;
+        }
+
+        .member-card-preview h3 {
+            color: #0284c7;
+            margin-bottom: 4px;
+            font-size: 18px;
+        }
+
+        .member-card-preview .code-badge {
+            font-size: 14px;
+            color: #475569;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .barcode-svg, .qrcode-box {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        /* Report Stat Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .stat-card.revenue { background: #e3f2fd; }
+        .stat-card.revenue .stat-value { color: #1565c0; }
+
+        .stat-card.monthly { background: #e8f5e9; }
+        .stat-card.monthly .stat-value { color: #2e7d32; }
+
+        .stat-card.daily { background: #fff3e0; }
+        .stat-card.daily .stat-value { color: #e65100; }
+
+        .stat-card.total { background: #f1f5f9; }
+        .stat-card.total .stat-value { color: var(--secondary); }
+    </style>
 </head>
 <body>
-<div class="app">
-    <header class="top">
-        <div class="top-row">
-            <div class="top-spacer" aria-hidden="true"></div>
-            <div class="brand">
-                <img src="logo-cis.jpg" alt="پەیمانگەی کۆمپیوتەری سلێمانی" class="institute-logo" id="main-logo">
-                <div class="brand-tx">
-                    <b>پەیمانگەی کۆمپیوتەری سلێمانی</b>
-                    <span>سیستەمی بەڕێوەبردنی پەیمانگە</span>
+
+<header>
+    <h1>🏊‍♂️ سیستەمی زیرەکی بەڕێوەبردنی مەلەوانگە</h1>
+    <p>تۆمارکردن، دروستکردنی QR/بارکۆد، و تۆمارکردنی کات و بەرواری هاتنەژوورەوە</p>
+</header>
+
+<div class="container">
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('scanTab')">📷 خوێندنەوەی بارکۆد (Check-In)</button>
+        <button class="tab-btn" onclick="switchTab('registerTab')">📝 تۆمارکردنی بەشداربووی نوێ</button>
+        <button class="tab-btn" onclick="switchTab('membersTab')">📋 لیستی بەشداربووان</button>
+        <button class="tab-btn" onclick="switchTab('logsTab')">⏱️ مێژووی هاتنەژوورەوەکان</button>
+        <button class="tab-btn" onclick="switchTab('reportTab')">📊 ڕاپۆرتی گشتی</button>
+    </div>
+
+    <!-- Tab 1: Scanner / Check-In -->
+    <div id="scanTab" class="tab-content active">
+        <div class="scan-container">
+            <div class="scan-input-box">
+                <h2 style="margin-bottom: 12px; color: var(--primary);">بارکۆدخوێن یان QR Code لێبدە</h2>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">
+                    ئامێری بارکۆدخوێنەکە لەسەر ئایکۆنەکە یان کارتەکەی بگرە (یان کۆدەکە تایپ بکە و Enter داگرە):
+                </p>
+                <input type="text" id="barcodeReaderInput" placeholder="کۆد لێبدە لێرە..." autofocus onkeydown="handleBarcodeScan(event)">
+            </div>
+
+            <!-- Result Box -->
+            <div id="memberResultCard" class="member-result-card">
+                <div class="result-header">
+                    <div>
+                        <h2 id="resName">ناوی بەشداربوو</h2>
+                        <span id="resCode" style="color: #64748b; font-size: 13px;">#1001</span>
+                    </div>
+                    <span id="resStatusBadge" class="badge">چالاک</span>
                 </div>
-            </div>
-            <div class="mobile-user" onclick="showProfile(event)" aria-hidden="true"></div>
-        </div>
-    </header>
 
-    <!-- ئاگاداریەکانی بەڕێوەبەر (سلایدەر) -->
-    <section class="hs-wrap">
-        <div class="hs-box" id="hsBox">
-            <div class="hs-track" id="hsTrack"></div>
-            <div class="hs-dots" id="hsDots"></div>
-        </div>
-    </section>
+                <div class="result-details">
+                    <div class="result-item">
+                        <span>جۆری بەشداری</span>
+                        <strong id="resType">مانگانە</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>ژمارەی مۆبایل</span>
+                        <strong id="resPhone">0770 123 4567</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>بەرواری پارەدان</span>
+                        <strong id="resPayDate">2026-08-01</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>بەرواری بەسەرچوون</span>
+                        <strong id="resExpDate">2026-09-01</strong>
+                    </div>
+                </div>
 
-    <main class="content-wrapper">
-        <!-- Hidden admin access -->
-        <div class="menu-card-container" id="adminSecretContainer" style="position: static; width: 0; height: 0; margin: 0; padding: 0; overflow: visible;">
-            <div class="dropdown-menu" id="adminDropdown">
-                <a href="admin.html" class="dropdown-item"><i class="fas fa-cog"></i><span>داشبۆردی بەڕێوەبەر</span></a>
-                <a href="staff.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i><span>کارمەندی غیابات</span></a>
-                <a href="assistant.html" class="dropdown-item"><i class="fas fa-user-shield"></i><span>یاریدەدەری بەڕێوەبەر</span></a>
-            </div>
-        </div>
+                <div id="scanAlert" style="padding: 12px; border-radius: 6px; font-weight: bold; margin-bottom: 16px;"></div>
 
-        <div class="main-menu-cards">
-            <a href="teacher.html" class="menu-card c-teacher">
-                <div class="menu-card-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-                <span>داشبۆردی مامۆستایان</span>
-            </a>
-            <a href="employee.html" class="menu-card c-employee">
-                <div class="menu-card-icon"><i class="fas fa-id-card"></i></div>
-                <span>داشبۆردی فەرمانبەران</span>
-            </a>
-            <a href="student.html" class="menu-card c-student">
-                <div class="menu-card-icon"><i class="fas fa-user-graduate"></i></div>
-                <span>داشبۆردی خوێندکار</span>
-            </a>
-            <a href="guardian.html" class="menu-card c-guardian">
-                <div class="menu-card-icon"><i class="fas fa-user-friends"></i></div>
-                <span>داشبۆردی بەخێوکار</span>
-            </a>
-
-            <div class="menu-card-container">
-                <button class="menu-card c-systems" onclick="toggleSystemsGroupDropdown(this)">
-                    <div class="menu-card-icon"><i class="fas fa-bars"></i></div>
-                    <span>سیستەمەکان</span>
+                <button class="btn btn-success" style="width: 100%;" onclick="confirmCheckIn()">
+                    ✅ تۆمارکردنی هاتنەژوورەوە لەم کاتەدا (Check-In)
                 </button>
-                <div class="dropdown-menu" id="systemsGroupDropdown">
-                    <a href="amar_fixed.html" class="dropdown-item"><i class="fas fa-suitcase"></i><span>سیستەمی ئامار</span></a>
-                    <a href="book.html" class="dropdown-item"><i class="fas fa-book"></i><span>سیستەمی کتێبخانە</span></a>
-                    <a href="https://research-system-cis.vercel.app/" target="_blank" class="dropdown-item"><i class="fas fa-search"></i><span>سیستەمی توێژینەوە</span></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Member Registration -->
+    <div id="registerTab" class="tab-content">
+        <h2 style="margin-bottom: 20px; color: var(--primary);">فۆرمی تۆمارکردنی بەشداربووی نوێ</h2>
+        <form id="registerForm" onsubmit="registerMember(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>ناوی تەواو</label>
+                    <input type="text" id="regName" required placeholder="نموونە: ئاراس ئەحمەد">
+                </div>
+                <div class="form-group">
+                    <label>ژمارەی مۆبایل</label>
+                    <input type="text" id="regPhone" placeholder="07xxxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>جۆری بەشداری</label>
+                    <select id="regType" onchange="updateExpDateOption()">
+                        <option value="monthly">مانگانە (30 ڕۆژ)</option>
+                        <option value="daily">ڕۆژانە (1 ڕۆژ)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>بڕی پارە (دینار)</label>
+                    <input type="number" id="regAmount" required value="25000">
+                </div>
+                <div class="form-group">
+                    <label>بەرواری پارەدان</label>
+                    <input type="date" id="regPayDate" required>
+                </div>
+                <div class="form-group">
+                    <label>بەرواری بەسەرچوون</label>
+                    <input type="date" id="regExpDate" required>
                 </div>
             </div>
+            <button type="submit" class="btn">💾 تۆمارکردن & دروستکردنی کارت</button>
+        </form>
+    </div>
 
-            <a href="staff-directory.html" class="menu-card c-staff">
-                <div class="menu-card-icon"><i class="fas fa-id-badge"></i></div>
-                <span>ستافی پەیمانگە</span>
-            </a>
-            <a href="archive.html" class="menu-card c-archive">
-                <div class="menu-card-icon"><i class="fas fa-trophy"></i></div>
-                <span>ئەرشیفی سەرکەوتووان</span>
-            </a>
-            <a href="about.html" class="menu-card c-about">
-                <div class="menu-card-icon"><i class="fas fa-info-circle"></i></div>
-                <span>دەربارە و پەیوەندی</span>
-            </a>
+    <!-- Tab 3: Members List -->
+    <div id="membersTab" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2>لیستی گشتی بەشداربووان</h2>
+            <input type="text" id="searchMemberInput" placeholder="گەڕان بەپێی ناو یان کۆد..." style="width: 260px;" onkeyup="filterMembersTable()">
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>کۆد</th>
+                    <th>ناو</th>
+                    <th>مۆبایل</th>
+                    <th>جۆری بەشداری</th>
+                    <th>پارەدان</th>
+                    <th>بەسەرچوون</th>
+                    <th>بارودۆخ</th>
+                    <th>کردارەکان</th>
+                </tr>
+            </thead>
+            <tbody id="membersTableBody">
+                <!-- Data populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tab 4: Logs -->
+    <div id="logsTab" class="tab-content">
+        <h2 style="margin-bottom: 16px;">مێژووی هاتنەژوورەوەی ڕۆژانە</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>کاتی هاتن</th>
+                    <th>بەروار</th>
+                    <th>کۆدی بەشداربوو</th>
+                    <th>ناو</th>
+                    <th>بارودۆخی کارت</th>
+                </tr>
+            </thead>
+            <tbody id="logsTableBody">
+                <!-- Logs populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tab 5: General Report -->
+    <div id="reportTab" class="tab-content">
+        <h2 style="margin-bottom: 20px; color: var(--primary);">📊 ڕاپۆرتی گشتی ئابوونەکان و داهات</h2>
+
+        <div class="stats-grid">
+            <div class="stat-card revenue">
+                <h3>کۆی گشتی داهات</h3>
+                <p id="totalRevenue" class="stat-value">0 دینار</p>
+            </div>
+            <div class="stat-card monthly">
+                <h3>بەشداربووانی مانگانە</h3>
+                <p id="monthlyCount" class="stat-value">0</p>
+            </div>
+            <div class="stat-card daily">
+                <h3>بەشداربووانی ڕۆژانە</h3>
+                <p id="dailyCount" class="stat-value">0</p>
+            </div>
+            <div class="stat-card total">
+                <h3>کۆی گشتی بەشداربووان</h3>
+                <p id="totalMembersCount" class="stat-value">0</p>
+            </div>
         </div>
 
-        <div id="navLoadingOverlay" class="nav-loading-overlay"><div class="nav-loading-spinner"></div></div>
-
-        <div class="footer">
-            <strong>ئەم سیستەمە لەلایەن ماجدانور دروستکراوە</strong> · پەیوەندی@2025: -7701458474<br>
-            © 2025 پەیمانگەی کۆمپیوتەری سلێمانی
-        </div>
-    </main>
-</div>
-
-<!-- وردەکاری ئاگاداری -->
-<div class="hs-modal" id="hsModal">
-    <div class="hs-card">
-        <div class="hs-card-top" id="hsModalTop"><small id="hsModalDate"></small><h3 id="hsModalTitle"></h3></div>
-        <div class="hs-card-body" id="hsModalBody"></div>
-        <button type="button" id="hsModalClose">داخستن</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>کۆد</th>
+                    <th>ناوی بەشداربوو</th>
+                    <th>ژمارەی تلفۆن</th>
+                    <th>جۆری ئابوونە</th>
+                    <th>بڕی پارە</th>
+                    <th>بەرواری دران</th>
+                    <th>بەسەرچوون</th>
+                </tr>
+            </thead>
+            <tbody id="reportTableBody">
+                <!-- زانیاری بەشداربووان لێرە بار دەکرێت -->
+            </tbody>
+        </table>
     </div>
 </div>
 
-    <script>
-        window.addEventListener('load', function() {
-            const logo = document.getElementById('main-logo');
-            logo.addEventListener('error', function() {
-                console.error('کێشەیەک لە بارکردنی لۆگۆدا هەیە');
-                this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiMwMDg4Y2MiLz4KPHRleHQgeD0iNDAiIHk9IjQ1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsIj5DSVM8L3RleHQ+Cjwvc3ZnPg==';
-            });
-        });
+<footer style="background: linear-gradient(135deg, #0f172a, #0284c7); color: white; text-align: center; padding: 24px 16px; margin-top: 32px;">
+    <p style="font-size: 14px; opacity: 0.9; margin-bottom: 6px;">
+        ئەم سیستەمە دروستکراوە لەلایەن <strong>ماجد ئەنوەر</strong>
+    </p>
+    <p style="font-size: 13px; opacity: 0.85; margin-bottom: 4px;">
+        📱 پەیوەندی: 0770 145 8474 &nbsp;|&nbsp; 📧 majidanwarhamarahim@gmail.com
+    </p>
+    <p style="font-size: 12px; opacity: 0.75;">
+        🇮🇶 عێراق - سلێمانی
+    </p>
+</footer>
 
-        function positionDropdown(dropdown, btn) {
-            const rect = btn.getBoundingClientRect();
-            const dropdownWidth = Math.max(240, rect.width);
-            let left = rect.left + (rect.width / 2) - (dropdownWidth / 2);
-            left = Math.max(12, Math.min(left, window.innerWidth - dropdownWidth - 12));
+<!-- Modal for Card Print & Preview -->
+<div id="cardModal" class="card-modal">
+    <div class="card-content">
+        <button class="close-btn" onclick="closeModal()">✕</button>
+        <h3>کارتی بەشداربووی مەلەوانگە</h3>
+        <p style="font-size: 12px; color: #64748b;">پیشاندانی QR Code و Barcode</p>
 
-            const margin = 12;
-            const spaceBelow = window.innerHeight - rect.bottom - margin - 10;
-            const spaceAbove = rect.top - margin - 10;
+        <div class="member-card-preview">
+            <h3 id="cardMemberName">ئاراس ئەحمەد</h3>
+            <div id="cardMemberCode" class="code-badge">کۆد: #1001</div>
 
-            dropdown.style.width = dropdownWidth + 'px';
-            dropdown.style.left = left + 'px';
+            <div style="display: flex; justify-content: space-around; align-items: center; margin: 12px 0;">
+                <div id="qrcode" class="qrcode-box"></div>
+            </div>
 
-            if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
-                dropdown.style.top = (rect.bottom + 10) + 'px';
-                dropdown.style.bottom = 'auto';
-                dropdown.style.maxHeight = Math.max(150, spaceBelow) + 'px';
-            } else {
-                dropdown.style.top = 'auto';
-                dropdown.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
-                dropdown.style.maxHeight = Math.max(150, spaceAbove) + 'px';
-            }
-            dropdown.style.overflowY = 'auto';
-        }
+            <svg id="barcodeCanvas" class="barcode-svg"></svg>
+            <div style="font-size: 11px; color: #64748b; margin-top: 8px;">
+                بەسەرچوون: <span id="cardMemberExp">2026-09-01</span>
+            </div>
+        </div>
 
-        function toggleMenuDropdown(dropdownId, btn) {
-            const dropdown = document.getElementById(dropdownId);
-            const isOpening = !dropdown.classList.contains('active');
+        <button class="btn" style="width: 100%; margin-top: 10px;" onclick="window.print()">🖨️ چاپکردنی کارت</button>
+    </div>
+</div>
 
-            // Close all other dropdowns first
-            document.querySelectorAll('.dropdown-menu.active').forEach(d => {
-                if (d !== dropdown) d.classList.remove('active');
-            });
-
-            if (isOpening && btn) {
-                positionDropdown(dropdown, btn);
-            }
-
-            dropdown.classList.toggle('active');
-        }
-
-        function toggleSystemsGroupDropdown(btn) {
-            toggleMenuDropdown('systemsGroupDropdown', btn);
-        }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
-            document.querySelectorAll('.menu-card-container').forEach(container => {
-                if (!container.contains(event.target)) {
-                    const dropdown = container.querySelector('.dropdown-menu');
-                    if (dropdown) dropdown.classList.remove('active');
-                }
-            });
-        });
-
-        // Close dropdowns on scroll to avoid misalignment (they're fixed-positioned)
-        window.addEventListener('scroll', function() {
-            document.querySelectorAll('.dropdown-menu.active').forEach(d => {
-                d.classList.remove('active');
-            });
-        }, { passive: true });
-
-        function showMenu(event) {
-            if (event) event.stopPropagation();
-            toggleMenuDropdown('systemsGroupDropdown', document.querySelector('.mobile-menu-btn'));
-        }
-
-        // Hidden admin access: click the profile icon, then enter the code.
-        // Only the admin should know this code — change ADMIN_ACCESS_CODE to whatever code you like.
-        const ADMIN_ACCESS_CODE = '1234';
-
-        function showProfile(event) {
-            if (event) event.stopPropagation();
-
-            const code = prompt('کۆدی چوونەژوورەوە بنووسە:');
-            if (code === null) return;
-
-            if (code === ADMIN_ACCESS_CODE) {
-                const dropdown = document.getElementById('adminDropdown');
-                const btn = document.querySelector('.mobile-user');
-                document.querySelectorAll('.dropdown-menu.active').forEach(d => {
-                    if (d !== dropdown) d.classList.remove('active');
-                });
-                positionDropdown(dropdown, btn);
-                dropdown.classList.add('active');
-            } else {
-                alert('کۆدەکە هەڵەیە');
-            }
-        }
-
-        // Instant feedback for dashboard cards that navigate to another page.
-        // Some pages (e.g. teacher.html) are large and take a moment to load
-        // on mobile, so without feedback users tap 2-3 times, and those extra
-        // taps then land on the new page once it finally renders (e.g. opening
-        // the QR-scanner modal by accident). Showing a spinner immediately and
-        // ignoring further taps on the same link fixes that.
-        (function preventDoubleNavTaps() {
-            const overlay = document.getElementById('navLoadingOverlay');
-            let navigating = false;
-
-            document.querySelectorAll('.main-menu-cards > a.menu-card[href]').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const href = this.getAttribute('href');
-                    // Skip in-page anchors / external links opened in a new tab
-                    if (!href || href.startsWith('#') || this.target === '_blank') return;
-
-                    if (navigating) {
-                        // A navigation is already in progress: swallow this
-                        // extra tap so it can't do anything else.
-                        e.preventDefault();
-                        e.stopPropagation();
-                        return;
-                    }
-                    navigating = true;
-                    if (overlay) overlay.classList.add('active');
-                    // Let the click's default navigation proceed normally.
-                }, true);
-            });
-        })();
-
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-    </script>
-
-<!-- Firebase (تەنها بۆ خوێندنەوەی سلایدەری ئاگاداریەکان) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
-(function () {
-    var CACHE_KEY = 'cis_home_slides_v1';
-    var CFG = {
-        apiKey: "AIzaSyBLlHLpZ0S3_Ll93-h93Nyhx2kuXChH1Js",
-        authDomain: "school-cis-e188b.firebaseapp.com",
-        databaseURL: "https://school-cis-e188b-default-rtdb.firebaseio.com",
-        projectId: "school-cis-e188b",
-        storageBucket: "school-cis-e188b.firebasestorage.app",
-        messagingSenderId: "206651660812",
-        appId: "1:206651660812:web:5d9b06f66e1352e3b5ec29"
-    };
-    var THEMES = {
-        blue:   'linear-gradient(135deg,#00bfff,#0072a8)',
-        green:  'linear-gradient(135deg,#10b981,#047857)',
-        orange: 'linear-gradient(135deg,#f59e0b,#ea580c)',
-        red:    'linear-gradient(135deg,#ef4444,#b91c1c)',
-        purple: 'linear-gradient(135deg,#8b5cf6,#6d28d9)',
-        teal:   'linear-gradient(135deg,#14b8a6,#0f766e)'
-    };
-    var DEFAULT_SLIDE = { title: 'بەخێربێن بۆ پەیمانگەی کۆمپیوتەری سلێمانی', message: 'لێرە دوایین ئاگاداریەکانی بەڕێوەبەرایەتی پیشان دەدرێن.', theme: 'blue', date: '' };
+    // API base - هەمان origin کە HTMLەکەی لێوە بار دەبێت (express.static)
+    const API_BASE = '/api';
 
-    var box = document.getElementById('hsBox'), track = document.getElementById('hsTrack'), dots = document.getElementById('hsDots');
-    var slides = [], cur = [DEFAULT_SLIDE], idx = 0, timer = null;
+    // کاش‌ی لۆکاڵی داتاکان (هەر جار لە سێرڤەرەوە نوێ دەکرێنەوە)
+    let members = [];
+    let logs = [];
+    let activeScannedMember = null;
 
-    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-    function fmt(iso) { var d = new Date(iso); if (isNaN(d)) return ''; return d.getFullYear() + '/' + ('0' + (d.getMonth() + 1)).slice(-2) + '/' + ('0' + d.getDate()).slice(-2); }
-
-    function normalize(obj) {
-        var list = [], now = Date.now();
-        Object.keys(obj || {}).forEach(function (k) {
-            var s = obj[k];
-            if (!s || s.active === false) return;
-            if (s.expiresAt) { var e = new Date(s.expiresAt + 'T23:59:59'); if (!isNaN(e) && e.getTime() < now) return; }
-            list.push({ id: k, title: s.title || '', message: s.message || '', theme: s.theme || 'blue', date: s.date || '' });
-        });
-        list.sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
-        return list.slice(0, 8);
-    }
-
-    function go(i, animate) {
-        idx = i;
-        track.style.transition = animate === false ? 'none' : '';
-        track.style.transform = 'translateX(' + (i * 100) + '%)';
-        Array.prototype.forEach.call(dots.children, function (d, n) { d.className = n === i ? 'on' : ''; });
-    }
-
-    function restart() {
-        if (timer) clearInterval(timer);
-        if (cur.length < 2) return;
-        timer = setInterval(function () { if (!document.hidden) go((idx + 1) % cur.length, true); }, 5000);
-    }
-
-    function render() {
-        cur = slides.length ? slides : [DEFAULT_SLIDE];
-        track.innerHTML = cur.map(function (s) {
-            return '<div class="hs-slide" style="background:' + (THEMES[s.theme] || THEMES.blue) + '">' +
-                '<div class="hs-ic"><i class="fas ' + (s.theme === 'red' ? 'fa-triangle-exclamation' : 'fa-bullhorn') + '"></i></div>' +
-                '<div class="hs-tx"><div class="hs-meta">' + (s.date ? esc(fmt(s.date)) : 'ئاگاداری') + '</div>' +
-                '<div class="hs-title">' + esc(s.title) + '</div><div class="hs-msg">' + esc(s.message) + '</div></div></div>';
-        }).join('');
-        dots.innerHTML = cur.length > 1 ? cur.map(function () { return '<span></span>'; }).join('') : '';
-        if (idx >= cur.length) idx = 0;
-        go(idx, false);
-        restart();
-    }
-
-    /* ---- swipe (RTL: dragging right shows the next slide) ---- */
-    var down = false, startX = 0, dx = 0;
-    box.addEventListener('pointerdown', function (e) {
-        down = true; startX = e.clientX; dx = 0; track.style.transition = 'none';
-        if (timer) clearInterval(timer);
-        try { box.setPointerCapture(e.pointerId); } catch (x) {}
+    // Set default dates + بارکردنی داتای سەرەتایی لە سێرڤەرەوە
+    document.addEventListener('DOMContentLoaded', () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('regPayDate').value = today;
+        updateExpDateOption();
+        fetchMembers();
+        fetchLogs();
     });
-    box.addEventListener('pointermove', function (e) {
-        if (!down) return;
-        dx = e.clientX - startX;
-        var d = dx;
-        if ((idx === 0 && d < 0) || (idx === cur.length - 1 && d > 0)) d = d * 0.3;
-        track.style.transform = 'translateX(calc(' + (idx * 100) + '% + ' + d + 'px))';
-    });
-    function end() {
-        if (!down) return; down = false;
-        if (Math.abs(dx) < 8) { go(idx, true); openModal(cur[idx]); restart(); return; }
-        var n = idx;
-        if (dx > 40 && idx < cur.length - 1) n = idx + 1;
-        else if (dx < -40 && idx > 0) n = idx - 1;
-        go(n, true); restart();
-    }
-    box.addEventListener('pointerup', end);
-    box.addEventListener('pointercancel', end);
 
-    /* ---- detail popup ---- */
-    var modal = document.getElementById('hsModal');
-    function openModal(s) {
-        if (!s) return;
-        document.getElementById('hsModalTop').style.background = THEMES[s.theme] || THEMES.blue;
-        document.getElementById('hsModalDate').textContent = s.date ? fmt(s.date) : 'ئاگاداری';
-        document.getElementById('hsModalTitle').textContent = s.title;
-        document.getElementById('hsModalBody').textContent = s.message;
-        modal.classList.add('open');
-    }
-    function closeModal() { modal.classList.remove('open'); }
-    document.getElementById('hsModalClose').addEventListener('click', closeModal);
-    modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-    /* ---- data: cache first, then live from Firebase ---- */
-    try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); if (c) slides = normalize(c); } catch (e) {}
-    render();
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
 
-    try {
-        if (typeof firebase !== 'undefined') {
-            if (!firebase.apps.length) firebase.initializeApp(CFG);
-            firebase.database().ref('homeSlides').on('value', function (snap) {
-                var v = snap.val() || {};
-                try { localStorage.setItem(CACHE_KEY, JSON.stringify(v)); } catch (e) {}
-                slides = normalize(v); idx = 0; render();
-            }, function (err) { console.log('[HomeSlides] read failed: ' + (err && err.message)); });
+        if (tabId === 'scanTab') {
+            setTimeout(() => document.getElementById('barcodeReaderInput').focus(), 100);
+        } else if (tabId === 'membersTab') {
+            fetchMembers();
+        } else if (tabId === 'logsTab') {
+            fetchLogs();
+        } else if (tabId === 'reportTab') {
+            loadReportData();
         }
-    } catch (e) { console.log('[HomeSlides] ' + e.message); }
-})();
-</script>
+    }
 
-<script src="onesignal-init.js"></script>
-<script src="permission-guide.js"></script>
-<script>CISPermissionGuide.init();</script>
+    function updateExpDateOption() {
+        const payDate = new Date(document.getElementById('regPayDate').value || new Date());
+        const type = document.getElementById('regType').value;
+
+        if (type === 'monthly') {
+            payDate.setDate(payDate.getDate() + 30);
+            document.getElementById('regAmount').value = 25000;
+        } else {
+            document.getElementById('regAmount').value = 5000;
+        }
+        document.getElementById('regExpDate').value = payDate.toISOString().split('T')[0];
+    }
+
+    document.getElementById('regPayDate').addEventListener('change', updateExpDateOption);
+
+    // ---------- Members: هێنان لە سێرڤەر ----------
+    async function fetchMembers() {
+        try {
+            const res = await fetch(`${API_BASE}/members`);
+            if (!res.ok) throw new Error('کێشە لە هێنانی بەشداربووان');
+            members = await res.json();
+            renderMembersTable();
+        } catch (err) {
+            console.error(err);
+            alert('⚠️ نەتوانرا پەیوەندی بە سێرڤەرەوە بکرێت. دڵنیابەرەوە سێرڤەرەکە کاردەکات.');
+        }
+    }
+
+    // Register New Member (تۆمارکردن لە PostgreSQL بە ڕێگەی API)
+    async function registerMember(e) {
+        e.preventDefault();
+        const payload = {
+            name: document.getElementById('regName').value,
+            phone: document.getElementById('regPhone').value,
+            type: document.getElementById('regType').value,
+            amount: document.getElementById('regAmount').value,
+            payDate: document.getElementById('regPayDate').value,
+            expDate: document.getElementById('regExpDate').value
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/members`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('کێشە لە تۆمارکردنی بەشداربوو');
+            const newMember = await res.json();
+
+            await fetchMembers();
+            document.getElementById('registerForm').reset();
+            document.getElementById('regPayDate').value = new Date().toISOString().split('T')[0];
+            updateExpDateOption();
+
+            // Show Card Modal
+            showMemberCard(newMember.member_code);
+        } catch (err) {
+            console.error(err);
+            alert('⚠️ کێشەیەک ڕوویدا لە کاتی تۆمارکردن: ' + err.message);
+        }
+    }
+
+    // Is Member Active?
+    function isMemberActive(expDateStr) {
+        const today = new Date().toISOString().split('T')[0];
+        return String(expDateStr).split('T')[0] >= today;
+    }
+
+    // Render Members Table
+    function renderMembersTable() {
+        const tbody = document.getElementById('membersTableBody');
+        tbody.innerHTML = '';
+
+        members.forEach(m => {
+            const active = isMemberActive(m.exp_date);
+            const badgeClass = active ? 'badge-active' : 'badge-expired';
+            const statusText = active ? 'چالاک' : 'بەسەرچوو';
+            const typeText = m.subscription_type === 'monthly' ? 'مانگانە' : 'ڕۆژانە';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>#${m.member_code}</strong></td>
+                    <td>${m.full_name}</td>
+                    <td>${m.phone || '-'}</td>
+                    <td>${typeText}</td>
+                    <td>${m.pay_date.split('T')[0]}</td>
+                    <td>${m.exp_date.split('T')[0]}</td>
+                    <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="showMemberCard('${m.member_code}')">🏷️ کارت / QR</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Handle Barcode Scanner Input (لێدان بۆ سێرڤەر بۆ دۆزینەوەی بەشداربوو)
+    async function handleBarcodeScan(e) {
+        if (e.key === 'Enter') {
+            const code = e.target.value.trim().replace('#', '');
+            e.target.value = '';
+            if (!code) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/members/scan/${encodeURIComponent(code)}`);
+                if (res.status === 404) {
+                    alert('⚠️ بەشداربوو نەدۆزرایەوە بەم کۆدە: ' + code);
+                    document.getElementById('memberResultCard').style.display = 'none';
+                    return;
+                }
+                if (!res.ok) throw new Error('کێشە لە خوێندنەوەی بەشداربوو');
+                const member = await res.json();
+                displayScannedMember(member);
+            } catch (err) {
+                console.error(err);
+                alert('⚠️ نەتوانرا پەیوەندی بە سێرڤەرەوە بکرێت.');
+            }
+        }
+    }
+
+    // Display Scanned Member Details
+    function displayScannedMember(member) {
+        activeScannedMember = member;
+        const card = document.getElementById('memberResultCard');
+        card.style.display = 'block';
+
+        document.getElementById('resName').innerText = member.full_name;
+        document.getElementById('resCode').innerText = '#' + member.member_code;
+        document.getElementById('resType').innerText = member.subscription_type === 'monthly' ? 'مانگانە' : 'ڕۆژانە';
+        document.getElementById('resPhone').innerText = member.phone || '-';
+        document.getElementById('resPayDate').innerText = member.pay_date.split('T')[0];
+        document.getElementById('resExpDate').innerText = member.exp_date.split('T')[0];
+
+        const active = isMemberActive(member.exp_date);
+        const badge = document.getElementById('resStatusBadge');
+        const alertBox = document.getElementById('scanAlert');
+
+        if (active) {
+            badge.className = 'badge badge-active';
+            badge.innerText = 'چالاک';
+            alertBox.style.background = '#dcfce7';
+            alertBox.style.color = '#15803d';
+            alertBox.innerText = '✅ کارتەکەی چالاکە و ڕێگەپێدراوە بۆ چوونەژوورەوە';
+        } else {
+            badge.className = 'badge badge-expired';
+            badge.innerText = 'بەسەرچوو';
+            alertBox.style.background = '#fee2e2';
+            alertBox.style.color = '#b91c1c';
+            alertBox.innerText = '⛔ بەرواری کارتەکەی بەسەرچووە! تکایە نوێی بکەرەوە';
+        }
+    }
+
+    // Confirm Check-In (تۆمارکردنی چوونەژوورەوە لە سێرڤەردا)
+    async function confirmCheckIn() {
+        if (!activeScannedMember) return;
+
+        const active = isMemberActive(activeScannedMember.exp_date);
+        const status = active ? 'ڕێگەپێدراو' : 'بەسەرچوو';
+
+        try {
+            const res = await fetch(`${API_BASE}/checkin`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ memberId: activeScannedMember.id, status })
+            });
+            if (!res.ok) throw new Error('کێشە لە تۆمارکردنی چوونەژوورەوە');
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ar-IQ');
+            await fetchLogs();
+
+            alert(`🟢 هاتنی بەشداربوو (${activeScannedMember.full_name}) لە کاتژمێر ${timeStr} تۆمارکرا.`);
+            document.getElementById('barcodeReaderInput').focus();
+        } catch (err) {
+            console.error(err);
+            alert('⚠️ کێشەیەک ڕوویدا لە کاتی تۆمارکردنی چوونەژوورەوە: ' + err.message);
+        }
+    }
+
+    // ---------- Logs: هێنان لە سێرڤەر ----------
+    async function fetchLogs() {
+        try {
+            const res = await fetch(`${API_BASE}/logs`);
+            if (!res.ok) throw new Error('کێشە لە هێنانی مێژوو');
+            logs = await res.json();
+            renderLogsTable();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // Render Check-In Logs Table
+    function renderLogsTable() {
+        const tbody = document.getElementById('logsTableBody');
+        tbody.innerHTML = '';
+
+        logs.forEach(l => {
+            const isOk = l.status === 'ڕێگەپێدراو';
+            const dt = new Date(l.checkin_time);
+            const dateStr = dt.toISOString().split('T')[0];
+            const timeStr = dt.toLocaleTimeString('ar-IQ');
+
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${timeStr}</strong></td>
+                    <td>${dateStr}</td>
+                    <td>#${l.member_code}</td>
+                    <td>${l.full_name}</td>
+                    <td>
+                        <span class="badge ${isOk ? 'badge-active' : 'badge-expired'}">${l.status}</span>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // ---------- Report: هێنان لە سێرڤەر ----------
+    async function loadReportData() {
+        try {
+            const res = await fetch(`${API_BASE}/reports`);
+            if (!res.ok) throw new Error('کێشە لە هێنانی ڕاپۆرت');
+            const data = await res.json();
+
+            document.getElementById('totalRevenue').innerText = Number(data.stats.total_revenue).toLocaleString() + ' دینار';
+            document.getElementById('monthlyCount').innerText = data.stats.monthly_count;
+            document.getElementById('dailyCount').innerText = data.stats.daily_count;
+            document.getElementById('totalMembersCount').innerText = data.stats.total_members;
+
+            const tableBody = document.getElementById('reportTableBody');
+            tableBody.innerHTML = '';
+
+            data.members.forEach(member => {
+                const typeText = member.subscription_type === 'monthly' ? 'مانگانە' : 'ڕۆژانە';
+
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>#${member.member_code}</td>
+                        <td>${member.full_name}</td>
+                        <td>${member.phone || '-'}</td>
+                        <td><b style="color: ${member.subscription_type === 'monthly' ? '#2e7d32' : '#e65100'};">${typeText}</b></td>
+                        <td><b>${Number(member.amount).toLocaleString()} دینار</b></td>
+                        <td>${member.pay_date.split('T')[0]}</td>
+                        <td>${member.exp_date.split('T')[0]}</td>
+                    </tr>
+                `;
+            });
+        } catch (error) {
+            console.error('کێشە لە هێنانی ڕاپۆرت:', error);
+            alert('⚠️ نەتوانرا ڕاپۆرتەکە بار بکرێت.');
+        }
+    }
+
+    // Show Card Modal with QR & Barcode
+    function showMemberCard(memberCode) {
+        const member = members.find(m => m.member_code === memberCode);
+        if (!member) return;
+
+        document.getElementById('cardMemberName').innerText = member.full_name;
+        document.getElementById('cardMemberCode').innerText = 'کۆد: #' + member.member_code;
+        document.getElementById('cardMemberExp').innerText = member.exp_date.split('T')[0];
+
+        // Clear previous QR
+        document.getElementById('qrcode').innerHTML = '';
+        new QRCode(document.getElementById("qrcode"), {
+            text: member.member_code,
+            width: 100,
+            height: 100
+        });
+
+        // Generate Barcode
+        JsBarcode("#barcodeCanvas", member.member_code, {
+            format: "CODE128",
+            width: 2,
+            height: 40,
+            displayValue: true
+        });
+
+        document.getElementById('cardModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('cardModal').style.display = 'none';
+    }
+
+    // Search filter
+    function filterMembersTable() {
+        const query = document.getElementById('searchMemberInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#membersTableBody tr');
+
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    }
+</script>
 </body>
 </html>
