@@ -45,8 +45,27 @@ function oneSignalBootstrap() {
         const OneSignal = window.plugins.OneSignal;
         OneSignal.initialize(ONESIGNAL_APP_ID);
         console.log("[OneSignalDiag] initialize() called OK. Requesting permission...");
-        OneSignal.Notifications.requestPermission(true);
+        // داواکاری ڕێگەپێدان لێرە نییە: مۆداڵە کوردییەکەی permission-guide.js ئەنجامی دەدات
         oneSignalReady = true;
+
+        // پارێزەر: هیچ پەڕەیەک نابێت خۆی داوای ڕێگەپێدانی ئاگادارکردنەوە بکات.
+        // تەنها مۆداڵە کوردییەکەی permission-guide.js (window.__cpgAllowPrompt) ڕێگەپێدراوە.
+        // ئەگەر شوێنێکی تر بانگی کرد، ڕێگری لێ دەکرێت و شوێنەکەی لە کۆنسۆڵ دەنووسرێت.
+        try {
+            const N = OneSignal.Notifications;
+            if (N && typeof N.requestPermission === 'function' && !N.__cisGuarded) {
+                const origRequest = N.requestPermission.bind(N);
+                N.requestPermission = function (fallbackToSettings) {
+                    if (!window.__cpgAllowPrompt) {
+                        console.log("[OneSignalDiag] BLOCKED requestPermission() from:\n" + (new Error().stack || ''));
+                        return Promise.resolve(false);
+                    }
+                    return origRequest(fallbackToSettings);
+                };
+                N.__cisGuarded = true;
+            }
+        } catch (e) { console.log("[OneSignalDiag] guard install failed: " + e.message); }
+
         console.log("[OneSignalDiag] Bootstrap finished successfully.");
 
         // ئەگەر بەکارهێنەر پێشتر چوونەژوورەوەی کردبوو (Auto-Login)،
